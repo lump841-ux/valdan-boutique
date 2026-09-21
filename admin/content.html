@@ -142,13 +142,24 @@
     document.getElementById('dirty-note').textContent = v ? 'You have unsaved changes.' : 'No unsaved changes.';
   }
 
+  function managedKeys() {
+    // Only the content_key values this page actually renders/edits — never
+    // push back rows this page didn't load into a GROUPS list (avoids
+    // accidentally upserting stray/extra site_content rows with no label).
+    return Object.values(GROUPS).flat().filter((k) => rows[k]);
+  }
+
   async function saveDraft() {
-    const updates = Object.values(rows).map((r) => ({
-      content_key: r.content_key,
-      draft_value: sanitize(r.draft_value || ''),
-      updated_by: window.vdCurrentAdmin.id,
-      updated_at: new Date().toISOString(),
-    }));
+    const updates = managedKeys().map((k) => {
+      const r = rows[k];
+      return {
+        content_key: r.content_key,
+        label: r.label,
+        draft_value: sanitize(r.draft_value || ''),
+        updated_by: window.vdCurrentAdmin.id,
+        updated_at: new Date().toISOString(),
+      };
+    });
     const { error } = await window.sb.from('site_content').upsert(updates, { onConflict: 'content_key' });
     return error;
   }
@@ -168,15 +179,19 @@
     let error = await saveDraft();
     if (!error) {
       const now = new Date().toISOString();
-      const updates = Object.values(rows).map((r) => ({
-        content_key: r.content_key,
-        draft_value: sanitize(r.draft_value || ''),
-        published_value: sanitize(r.draft_value || ''),
-        updated_by: window.vdCurrentAdmin.id,
-        published_by: window.vdCurrentAdmin.id,
-        updated_at: now,
-        published_at: now,
-      }));
+      const updates = managedKeys().map((k) => {
+        const r = rows[k];
+        return {
+          content_key: r.content_key,
+          label: r.label,
+          draft_value: sanitize(r.draft_value || ''),
+          published_value: sanitize(r.draft_value || ''),
+          updated_by: window.vdCurrentAdmin.id,
+          published_by: window.vdCurrentAdmin.id,
+          updated_at: now,
+          published_at: now,
+        };
+      });
       const res = await window.sb.from('site_content').upsert(updates, { onConflict: 'content_key' });
       error = res.error;
     }
