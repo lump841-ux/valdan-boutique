@@ -181,6 +181,13 @@ async function vdApplySiteContent() {
 function vdMapDbProduct(row) {
   const images = (row.product_images || []).slice().sort((a, b) => a.sort_order - b.sort_order);
   const primary = images.find((i) => i.is_primary) || images[0];
+  // The 6 collection pages (princess-collection.html, etc.) filter products by
+  // a plain `collection` name string, matching what the admin's Collections
+  // page calls the collection ("Princess Collection", "Gift Sets", etc.) —
+  // so a product's first assigned collection's title is surfaced here too.
+  const collectionTitles = (row.collection_products || [])
+    .map((cp) => cp.collections?.title)
+    .filter(Boolean);
   return {
     id: row.id,
     name: row.name,
@@ -189,6 +196,8 @@ function vdMapDbProduct(row) {
     // if there's a sale price, show it as the active price and price as "was"
     ...(row.sale_price ? { price: Number(row.sale_price), wasPrice: Number(row.price) } : {}),
     category: row.category,
+    collection: collectionTitles[0] || null,
+    collections: collectionTitles,
     sizes: row.sizes || [],
     colors: row.colors || [],
     img: primary?.media_assets?.public_url || '',
@@ -200,16 +209,17 @@ function vdMapDbProduct(row) {
 }
 
 /**
- * Fetches published products from Supabase. Returns null (meaning "use the
- * existing static PRODUCTS array") if the backend isn't configured or the
- * table is empty — the site never shows a blank shop because of this.
+ * Fetches published products from Supabase. Returns null if the backend
+ * isn't configured or there are no published products yet — in that case
+ * shop.js leaves ALL_PRODUCTS empty and every page shows its normal
+ * "nothing here yet" empty state rather than any placeholder/demo photos.
  */
 async function vdFetchPublishedProducts() {
   if (!window.vdPublicClient) return null;
   try {
     const { data, error } = await window.vdPublicClient
       .from('products')
-      .select('*, product_images(sort_order, is_primary, alt_text, media_assets(public_url))')
+      .select('*, product_images(sort_order, is_primary, alt_text, media_assets(public_url)), collection_products(collections(title))')
       .eq('status', 'published')
       .order('sort_order');
     if (error || !data || !data.length) return null;

@@ -94,6 +94,9 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="site-data.js"></script>
 <script src="shop.js"></script>
 <script>
 (function () {
@@ -117,6 +120,7 @@
       btn.addEventListener('click', () => setTimeout(render, 250));
     });
   }
+  window.vdRerenderCatalog = render;
   render();
 })();
 </script>

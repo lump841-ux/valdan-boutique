@@ -79,35 +79,35 @@
     </div>
     <div class="fig-cat-grid">
       <a class="fig-cat-card" href="shop.html?category=Unisex">
-        <div class="fig-cat-photo"><img src="product-teddy-bear.jpg" alt="Little Ones" /></div>
+        <div class="fig-cat-photo"><img src="collection-newborn.jpg" alt="Little Ones" /></div>
         <div class="fig-cat-info">
           <h3>Little Ones</h3>
           <span>Shop Now →</span>
         </div>
       </a>
       <a class="fig-cat-card" href="shop.html?category=Boys">
-        <div class="fig-cat-photo"><img src="product-boy-outfit.jpg" alt="Adventurers" /></div>
+        <div class="fig-cat-photo"><img src="collection-gentleman.jpg" alt="Adventurers" /></div>
         <div class="fig-cat-info">
           <h3>Adventurers</h3>
           <span>Shop Now →</span>
         </div>
       </a>
       <a class="fig-cat-card" href="shop.html">
-        <div class="fig-cat-photo"><img src="product-boy-bowtie.jpg" alt="Outdoor Layers" /></div>
+        <div class="fig-cat-photo"><img src="collection-seasonal.jpg" alt="Outdoor Layers" /></div>
         <div class="fig-cat-info">
           <h3>Outdoor Layers</h3>
           <span>Shop Now →</span>
         </div>
       </a>
       <a class="fig-cat-card" href="shop.html?category=Accessories">
-        <div class="fig-cat-photo"><img src="product-teddy-bow.jpg" alt="Accessories" /></div>
+        <div class="fig-cat-photo"><img src="collection-cozy.jpg" alt="Accessories" /></div>
         <div class="fig-cat-info">
           <h3>Accessories</h3>
           <span>Shop Now →</span>
         </div>
       </a>
       <a class="fig-cat-card" href="shop.html?category=Gift+Sets">
-        <div class="fig-cat-photo"><img src="product-girl-bow.jpg" alt="Gift Bundles" /></div>
+        <div class="fig-cat-photo"><img src="collection-giftsets.jpg" alt="Gift Bundles" /></div>
         <div class="fig-cat-info">
           <h3>Gift Bundles</h3>
           <span>Shop Now →</span>
@@ -235,29 +235,16 @@
   vdApplySiteContent();
 
   function renderHomeGrids() {
-    // "Fresh Finds" — a curated 5-up row matching the Figma home frame.
-    // Real catalog products/ids are used underneath (so wishlist, Quick
-    // View and Add-to-Cart all still work against real data) but the
-    // displayed name/price/photo are overridden to match the exact
-    // Figma copy for this section.
-    const byId = (id) => ALL_PRODUCTS.find((p) => p.id === id);
-    const freshFindsSpec = [
-      { id: 'flutter-sleeve-romper', name: 'Meadow Romper', price: 38.00, img: 'product-girl-dress.jpg' },
-      { id: 'little-explorer-set', name: 'Forest Floor Dungarees', price: 45.00, img: 'product-forest-dungarees.jpg' },
-      { id: 'lavender-dreams-dress', name: 'Willow Knit Dress', price: 42.00, img: 'product-willow-knit-dress.jpg' },
-      { id: 'classic-knit-cardigan', name: 'Mossy Cardigan', price: 36.00, img: 'product-mossy-cardigan.jpg' },
-      { id: 'meadow-bloom-set', name: 'Petal Tulle Skirt', price: 39.00, img: 'product-petal-tulle-skirt.jpg' },
-    ];
-    const freshFinds = freshFindsSpec
-      .map((spec) => {
-        const base = byId(spec.id);
-        if (!base) return null;
-        return { ...base, name: spec.name, price: spec.price, wasPrice: null, img: spec.img, badge: null };
-      })
-      .filter(Boolean);
-    const freshFindsFinal = freshFinds.length ? freshFinds : ALL_PRODUCTS.slice(0, 5);
-
-    document.getElementById('fresh-finds-grid').innerHTML = freshFindsFinal.map((p) => productCardHTML(p)).join('');
+    // "Fresh Finds" — a 5-up row of whatever's currently published in the
+    // admin console (Products page), most recently sorted ones first. No
+    // demo/placeholder products — this is empty until real ones are added.
+    const grid = document.getElementById('fresh-finds-grid');
+    const freshFindsFinal = ALL_PRODUCTS.slice(0, 5);
+    if (!freshFindsFinal.length) {
+      grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--ink-2,#8a8794);padding:24px 0;">New arrivals are on their way — check back soon!</p>';
+      return;
+    }
+    grid.innerHTML = freshFindsFinal.map((p) => productCardHTML(p)).join('');
     wireWishButtons();
   }
   window.vdRerenderCatalog = renderHomeGrids;
