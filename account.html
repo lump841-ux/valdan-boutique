@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Account — Val & Dan Kids Boutique</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .acct-wrap { max-width:420px; margin:0 auto; padding:56px 0 90px; }
+  .acct-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:36px; }
+  .acct-tabs { display:flex; gap:8px; margin-bottom:26px; background:var(--pink-lt); border-radius:50px; padding:4px; }
+  .acct-tab { flex:1; text-align:center; padding:10px; border-radius:50px; font-size:13px; font-weight:700; color:var(--ink-2); cursor:pointer; transition:.2s; }
+  .acct-tab.active { background:#fff; color:var(--pink); box-shadow:var(--shadow-sm); }
+  .acct-panel { display:none; }
+  .acct-panel.active { display:block; }
+  .acct-field { margin-bottom:16px; }
+  .acct-field label { display:block; font-size:12px; font-weight:700; color:var(--ink-2); margin-bottom:6px; text-transform:uppercase; letter-spacing:.4px; }
+  .acct-field input {
+    width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid var(--border); font-size:14px; color:var(--ink);
+  }
+  .acct-field input:focus { outline:none; border-color:var(--pink); }
+</style>
+</head>
+<body>
+
+<div class="announce-bar">
+  <div class="container">
+    <span>✦ Free Shipping on all orders over $60 — use code <strong>LITTLEFERNS</strong></span>
+    <div class="announce-links"><a href="#">Track Order</a><a href="#">Help / FAQ</a></div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop <span class="caret">▾</span></a>
+      <a href="collections.html">Collections <span class="caret">▾</span></a>
+      <a href="about.html">Our Story</a>
+    </nav>
+    <a href="index.html" class="logo-badge">
+      <img src="logo.jpg" alt="Val &amp; Dan Kids Boutique" />
+    </a>
+    <div class="header-icons">
+      <a href="shop.html" aria-label="Search">🔍</a>
+      <a href="account.html" aria-label="Account">👤</a>
+      <a href="cart.html" aria-label="Cart">🛍️<span class="icon-badge" id="cart-count">0</span></a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="collections.html">Collections</a>
+  <a href="about.html">Our Story</a>
+</div>
+
+<div class="container">
+  <div class="acct-wrap">
+    <div class="acct-card">
+      <div class="acct-tabs">
+        <div class="acct-tab active" data-tab="login">Log In</div>
+        <div class="acct-tab" data-tab="register">Create Account</div>
+      </div>
+
+      <div class="acct-panel active" id="panel-login">
+        <div class="acct-field"><label>Email</label><input type="email" placeholder="you@example.com" /></div>
+        <div class="acct-field"><label>Password</label><input type="password" placeholder="••••••••" /></div>
+        <button class="btn btn-primary btn-full" onclick="showToast('This is a demo store — accounts aren\'t connected yet 💗')">Log In</button>
+        <p style="text-align:center;font-size:12.5px;color:var(--ink-2);margin-top:14px"><a href="#" style="color:var(--pink)">Forgot your password?</a></p>
+      </div>
+
+      <div class="acct-panel" id="panel-register">
+        <div class="acct-field"><label>Full Name</label><input type="text" placeholder="Jamie Parker" /></div>
+        <div class="acct-field"><label>Email</label><input type="email" placeholder="you@example.com" /></div>
+        <div class="acct-field"><label>Password</label><input type="password" placeholder="••••••••" /></div>
+        <button class="btn btn-primary btn-full" onclick="showToast('This is a demo store — accounts aren\'t connected yet 💗')">Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="footer-logo"><img src="logo.jpg" alt="Val &amp; Dan Kids Boutique" /></a>
+        <p>Adorable, comfortable and quality clothing for your little ones — made for every little moment.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html?category=Girls">Girls</a></li>
+          <li><a href="shop.html?category=Boys">Boys</a></li>
+          <li><a href="shop.html?category=Unisex">Unisex</a></li>
+          <li><a href="shop.html?category=Accessories">Accessories</a></li>
+          <li><a href="shop.html?category=Gift+Sets">Gift Sets</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Customer Service</h4>
+        <ul>
+          <li><a href="about.html">Our Story</a></li>
+          <li><a href="#">Track Order</a></li>
+          <li><a href="#">Shipping &amp; Returns</a></li>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-col footer-newsletter">
+        <h4>Stay in Touch</h4>
+        <p style="font-size:13px;color:#B7ACBA;margin-bottom:14px">Sign up for 10% off your first order.</p>
+        <input type="email" placeholder="Your email address" />
+        <button class="btn btn-primary btn-full btn-sm">Subscribe</button>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Val &amp; Dan Kids Boutique. All rights reserved.</span>
+      <div class="footer-social"><a href="#">📷</a><a href="#">📘</a><a href="#">📌</a></div>
+    </div>
+  </div>
+</footer>
+
+<script src="shop.js"></script>
+<script>
+  document.querySelectorAll('.acct-tab').forEach(tab => {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.acct-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.acct-panel').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById('panel-' + this.getAttribute('data-tab')).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

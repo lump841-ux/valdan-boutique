@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Media Library — Val & Dan Admin</title>
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="admin.css" />
+<style>
+  /* Quick-upload banner ("Want to add more photos?") — mirrors the Figma
+     frame's compact call-to-action card. Clicking "Upload New Files" reveals
+     the actual dropzone + category/alt-text fields (unchanged working flow)
+     below it, since the Figma frame doesn't show that panel expanded. */
+  .vd-quick-upload-banner {
+    background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:24px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  }
+  .vd-quick-upload-banner .left { display:flex; align-items:center; gap:16px; }
+  .vd-quick-upload-banner .ic-wrap {
+    background:var(--pink-lt); border-radius:8px; padding:12px; font-size:20px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .vd-quick-upload-banner h2 { font-family:"Fraunces", serif; font-size:17px; font-weight:600; color:var(--ink); margin-bottom:2px; }
+  .vd-quick-upload-banner p { font-size:12.5px; color:var(--ink-2); }
+  .vd-quick-upload-banner .btn { flex-shrink:0; }
+
+  .vd-upload-panel { display:none; margin-top:18px; }
+  .vd-upload-panel.open { display:block; }
+  .vd-upload-drop { border:2px dashed var(--border); border-radius:var(--radius-sm); padding:26px; text-align:center; color:var(--ink-2); font-size:13px; cursor:pointer; transition:.15s; }
+  .vd-upload-drop:hover, .vd-upload-drop.dragover { border-color:var(--pink); background:var(--pink-lt); }
+
+  /* Category filter pills (All Media / Products / Lifestyle / Lookbook) */
+  .vd-filter-pills { display:flex; gap:8px; flex-wrap:wrap; }
+  .vd-filter-pill {
+    padding:8px 16px; border-radius:20px; border:1px solid var(--border); background:#fff;
+    font-size:12.5px; font-weight:600; color:var(--ink-2); transition:.15s;
+  }
+  .vd-filter-pill:hover { border-color:var(--pink); }
+  .vd-filter-pill.active { background:var(--pink); border-color:var(--pink); color:#fff; }
+  .vd-filters-bar { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px; }
+  .vd-filters-bar-right { display:flex; align-items:center; gap:10px; }
+  .vd-filters-bar-right select { padding:8px 13px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; background:#fff; }
+
+  /* Photo cards — image, category tag + dimensions, filename, upload date,
+     divider, Edit Details / delete row — matches the Figma card exactly. */
+  .vd-media-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:20px; }
+  .vd-media-tile { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; transition:.15s ease; }
+  .vd-media-tile:hover { border-color:var(--pink); box-shadow:var(--shadow-sm); }
+  .vd-media-tile img { width:100%; height:200px; object-fit:cover; display:block; background:var(--beige); cursor:pointer; }
+  .vd-media-tile .meta { padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .vd-media-tile .top-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .vd-media-tile .cat-tag {
+    background:var(--pink-lt); color:var(--pink-dk); font-size:10px; font-weight:700;
+    padding:3px 8px; border-radius:4px; text-transform:capitalize;
+  }
+  .vd-media-tile .dims { font-size:11px; color:var(--ink-2); }
+  .vd-media-tile .fname { font-size:14px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .vd-media-tile .uploaded { font-size:11px; color:var(--ink-2); }
+  .vd-media-tile .divider { height:1px; background:var(--border); }
+  .vd-media-tile .action-row { display:flex; align-items:center; justify-content:space-between; }
+  .vd-media-tile .edit-link { display:flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:var(--pink-dk); }
+  .vd-media-tile .del-btn {
+    background:#FEE2E2; color:#C4423D; border-radius:6px; padding:6px; font-size:12px;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .vd-view-toggle { display:flex; gap:6px; }
+  .vd-view-toggle button { padding:8px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:12.5px; font-weight:700; }
+  .vd-view-toggle button.active { background:var(--pink); color:#fff; border-color:var(--pink); }
+  #list-view { display:none; }
+  .vd-detail-overlay { position:fixed; inset:0; background:rgba(43,34,48,.45); z-index:850; display:none; align-items:center; justify-content:center; padding:20px; }
+  .vd-detail-overlay.open { display:flex; }
+  .vd-detail-modal { background:#fff; border-radius:var(--radius); padding:26px; max-width:520px; width:100%; box-shadow:var(--shadow-lux); max-height:88vh; overflow:auto; }
+  .vd-detail-modal img { width:100%; border-radius:var(--radius-sm); margin-bottom:14px; max-height:260px; object-fit:cover; }
+
+  @media (max-width: 768px) {
+    .vd-quick-upload-banner { flex-direction:column; align-items:flex-start; }
+    .vd-quick-upload-banner .btn { width:100%; text-align:center; }
+    .vd-filters-bar { flex-direction:column; align-items:stretch; }
+    .vd-filters-bar-right { flex-wrap:wrap; }
+    .vd-media-grid { grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:14px; }
+  }
+  @media (max-width: 480px) {
+    .vd-media-grid { grid-template-columns:1fr 1fr; gap:10px; }
+    .vd-media-tile img { height:140px; }
+    .vd-media-tile .meta { padding:10px; gap:8px; }
+  }
+</style>
+</head>
+<body class="vd-admin">
+<div id="vd-config-warning" class="vd-config-warning">⚠️ Supabase isn't connected yet — edit <code>admin/js/config.js</code>. See README-ADMIN.md.</div>
+
+<div class="vd-shell">
+  <aside class="vd-sidebar" id="vd-sidebar">
+    <div class="vd-sidebar-logo"><img src="../logo.jpg" alt="Val & Dan Kids Boutique" /><div><span>Val &amp; Dan</span><small>Admin</small></div></div>
+    <nav class="vd-nav">
+      <a href="dashboard.html"><span class="ic">🏠</span> Dashboard</a>
+      <a href="hero-images.html"><span class="ic">🖼️</span> Hero Images</a>
+      <a href="products.html"><span class="ic">👕</span> Products</a>
+      <a href="orders.html"><span class="ic">📦</span> Orders</a>
+      <a href="collections.html"><span class="ic">🎀</span> Collections</a>
+      <a href="new-arrivals.html"><span class="ic">✨</span> New Arrivals</a>
+      <a href="media-library.html" class="active"><span class="ic">🗂️</span> Media Library</a>
+      <a href="content.html"><span class="ic">📝</span> Website Content</a>
+      <a href="messages.html"><span class="ic">✉️</span> Messages</a>
+      <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
+      <a href="#" class="vd-nav-logout" data-vd-logout><span class="ic">🚪</span> Log Out</a>
+    </nav>
+  </aside>
+
+  <div class="vd-main">
+    <div class="vd-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="vd-mobile-nav-toggle" aria-label="Menu">☰</button>
+        <h1>Media Library</h1>
+      </div>
+      <div class="vd-topbar-right">
+        <div class="vd-topbar-search"><span class="ic">🔍</span><input type="text" id="search-input" placeholder="Search photos by name, tag, or product…" aria-label="Search photos" /></div>
+        <button class="vd-bell-btn" aria-label="Notifications">🔔</button>
+        <a href="../index.html" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Visit Store ♡ ↗</a>
+        <div class="vd-admin-chip"><span class="avatar" id="vd-admin-initial">A</span><span id="vd-admin-name">…</span></div>
+      </div>
+    </div>
+
+    <div class="vd-content">
+      <div class="vd-quick-upload-banner" style="margin-bottom:24px;">
+        <div class="left">
+          <div class="ic-wrap">📤</div>
+          <div>
+            <h2>Want to add more photos?</h2>
+            <p>Drag and drop files anywhere or quick-upload instantly.</p>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-toggle-upload">+ Upload New Files</button>
+      </div>
+
+      <div class="vd-card vd-upload-panel" id="ml-upload-panel" style="margin-bottom:18px;">
+        <label class="vd-upload-drop" for="ml-file-input" id="ml-dropzone" style="display:block;">
+          📤 Drag &amp; drop your photos here or click to browse<br />
+          <span style="font-size:11.5px;">Supports JPG, PNG, WebP up to 10MB each</span>
+        </label>
+        <input type="file" id="ml-file-input" accept="image/jpeg,image/jpg,image/png,image/webp" multiple style="display:none" />
+
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;">
+          <div class="vd-field" style="flex:1;min-width:180px;">
+            <label>Category Tag</label>
+            <select id="ml-upload-category">
+              <option value="media-library">Lifestyle</option>
+              <option value="product">Product</option>
+              <option value="hero">Hero</option>
+              <option value="collection">Collection</option>
+            </select>
+          </div>
+          <div class="vd-field" style="flex:2;min-width:220px;">
+            <label>Alt Text (SEO Description)</label>
+            <input type="text" id="ml-upload-alt" placeholder="Describe this photo for search &amp; accessibility…" />
+          </div>
+        </div>
+
+        <div id="ml-upload-progress" style="margin-top:10px;font-size:12.5px;color:var(--ink-2);"></div>
+      </div>
+
+      <div class="vd-card">
+        <div class="vd-filters-bar">
+          <div class="vd-filter-pills" id="filter-pills">
+            <button type="button" class="vd-filter-pill active" data-cat="">All Media</button>
+            <button type="button" class="vd-filter-pill" data-cat="product">Products</button>
+            <button type="button" class="vd-filter-pill" data-cat="media-library">Lifestyle</button>
+            <button type="button" class="vd-filter-pill" data-cat="collection">Lookbook</button>
+          </div>
+          <div class="vd-filters-bar-right">
+            <select id="filter-category" style="display:none">
+              <option value="">All Categories</option>
+              <option value="hero">Hero Images</option>
+              <option value="product">Products</option>
+              <option value="collection">Collections</option>
+              <option value="media-library">Media Library</option>
+            </select>
+            <div class="vd-view-toggle">
+              <button id="btn-grid" class="active">Grid</button>
+              <button id="btn-list">List</button>
+            </div>
+          </div>
+        </div>
+        <p id="result-count" style="font-size:12.5px;color:var(--ink-2);margin-bottom:14px;">Loading…</p>
+
+        <div class="vd-media-grid" id="grid-view"></div>
+
+        <table class="vd-table" id="list-view">
+          <thead><tr><th></th><th>Filename</th><th>Category</th><th>Dimensions</th><th>Size</th><th>Uploaded</th><th></th></tr></thead>
+          <tbody id="list-rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="vd-detail-overlay" id="detail-overlay">
+  <div class="vd-detail-modal">
+    <img id="d-img" src="" alt="" />
+    <div class="vd-field"><label>Alt Text</label><input type="text" id="d-alt" /></div>
+    <p style="font-size:12.5px;color:var(--ink-2);margin-bottom:6px;"><strong>Filename:</strong> <span id="d-filename"></span></p>
+    <p style="font-size:12.5px;color:var(--ink-2);margin-bottom:6px;"><strong>Dimensions:</strong> <span id="d-dims"></span></p>
+    <p style="font-size:12.5px;color:var(--ink-2);margin-bottom:6px;"><strong>Size:</strong> <span id="d-size"></span></p>
+    <p style="font-size:12.5px;color:var(--ink-2);margin-bottom:6px;"><strong>Uploaded:</strong> <span id="d-date"></span></p>
+    <p style="font-size:12.5px;color:var(--ink-2);margin-bottom:14px;"><strong>Used in:</strong> <span id="d-usage">Checking…</span></p>
+    <div class="vd-btn-row">
+      <button class="btn btn-outline btn-sm" id="btn-close-detail">Close</button>
+      <button class="btn btn-outline btn-sm" id="btn-copy-url">Copy Image URL</button>
+      <button class="btn btn-outline btn-sm" id="btn-save-alt">Save Alt Text</button>
+      <button class="btn btn-danger btn-sm" id="btn-delete-asset">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/upload.js"></script>
+<script src="js/activity-log.js"></script>
+<script>
+  let allAssets = [];
+  let activeAsset = null;
+
+  function fmtBytes(n) {
+    if (!n) return '—';
+    if (n < 1024) return n + ' B';
+    if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+    return (n / 1024 / 1024).toFixed(2) + ' MB';
+  }
+
+  async function loadAssets() {
+    const search = document.getElementById('search-input').value.trim().toLowerCase();
+    const cat = document.getElementById('filter-category').value;
+    let q = window.sb.from('media_assets').select('*').order('created_at', { ascending: false });
+    if (cat) q = q.eq('category', cat);
+    const { data, error } = await q;
+    allAssets = data || [];
+    if (search) {
+      allAssets = allAssets.filter((a) => (a.original_filename || '').toLowerCase().includes(search) || (a.alt_text || '').toLowerCase().includes(search));
+    }
+    render();
+    if (error) vdToast('Could not load media: ' + error.message, 'error');
+  }
+
+  function render() {
+    document.getElementById('result-count').textContent = allAssets.length + (allAssets.length === 1 ? ' file' : ' files');
+    const grid = document.getElementById('grid-view');
+    grid.innerHTML = allAssets.map((a) => `
+      <div class="vd-media-tile" data-id="${a.id}">
+        <img src="${a.public_url}" alt="${a.alt_text || ''}" loading="lazy" />
+        <div class="meta">
+          <div>
+            <div class="top-row"><span class="cat-tag">${a.category || 'media'}</span><span class="dims">${a.width && a.height ? a.width + ' x ' + a.height : ''}</span></div>
+            <div class="fname">${a.original_filename || 'untitled.jpg'}</div>
+            <div class="uploaded">Uploaded on ${new Date(a.created_at).toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' })}</div>
+          </div>
+          <div class="divider"></div>
+          <div class="action-row">
+            <button type="button" class="edit-link" data-open="${a.id}">✏️ Edit Details</button>
+            <button type="button" class="del-btn" data-del="${a.id}" aria-label="Delete">🗑️</button>
+          </div>
+        </div>
+      </div>`).join('') || '<p class="hint">No media uploaded yet.</p>';
+    grid.querySelectorAll('.vd-media-tile img').forEach((img) => img.addEventListener('click', () => openDetail(img.closest('.vd-media-tile').getAttribute('data-id'))));
+    grid.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openDetail(b.getAttribute('data-open'))));
+    grid.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', async () => {
+      await openDetail(b.getAttribute('data-del'));
+      document.getElementById('btn-delete-asset').click();
+    }));
+
+    const rows = document.getElementById('list-rows');
+    rows.innerHTML = allAssets.map((a) => `
+      <tr data-id="${a.id}" style="cursor:pointer;">
+        <td><img class="thumb" src="${a.public_url}" alt="" /></td>
+        <td>${a.original_filename || '—'}</td>
+        <td>${a.category}</td>
+        <td>${a.width && a.height ? a.width + '×' + a.height : '—'}</td>
+        <td>${fmtBytes(a.file_size_bytes)}</td>
+        <td>${new Date(a.created_at).toLocaleDateString()}</td>
+        <td><button data-open="${a.id}">Details</button></td>
+      </tr>`).join('') || '<tr class="vd-empty-row"><td colspan="7">No media uploaded yet.</td></tr>';
+    rows.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); openDetail(b.getAttribute('data-open')); }));
+    rows.querySelectorAll('tr[data-id]').forEach((tr) => tr.addEventListener('click', () => openDetail(tr.getAttribute('data-id'))));
+  }
+
+  document.getElementById('btn-grid').addEventListener('click', () => { document.getElementById('grid-view').style.display = 'grid'; document.getElementById('list-view').style.display = 'none'; document.getElementById('btn-grid').classList.add('active'); document.getElementById('btn-list').classList.remove('active'); });
+  document.getElementById('btn-list').addEventListener('click', () => { document.getElementById('grid-view').style.display = 'none'; document.getElementById('list-view').style.display = 'table'; document.getElementById('btn-list').classList.add('active'); document.getElementById('btn-grid').classList.remove('active'); });
+
+  document.getElementById('search-input').addEventListener('input', debounce(loadAssets, 300));
+  document.getElementById('filter-category').addEventListener('change', loadAssets);
+  function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+  // Category filter pills (All Media / Products / Lifestyle / Lookbook) —
+  // drive the existing (now hidden) <select id="filter-category"> so the
+  // working loadAssets()/filter logic is reused unchanged.
+  document.querySelectorAll('#filter-pills .vd-filter-pill').forEach((pill) => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('#filter-pills .vd-filter-pill').forEach((p) => p.classList.remove('active'));
+      pill.classList.add('active');
+      document.getElementById('filter-category').value = pill.getAttribute('data-cat');
+      loadAssets();
+    });
+  });
+
+  // "Upload New Files" banner button toggles the upload panel open.
+  document.getElementById('btn-toggle-upload').addEventListener('click', () => {
+    document.getElementById('ml-upload-panel').classList.toggle('open');
+  });
+
+  async function openDetail(id) {
+    activeAsset = allAssets.find((a) => a.id === id);
+    if (!activeAsset) return;
+    document.getElementById('d-img').src = activeAsset.public_url;
+    document.getElementById('d-alt').value = activeAsset.alt_text || '';
+    document.getElementById('d-filename').textContent = activeAsset.original_filename || '—';
+    document.getElementById('d-dims').textContent = activeAsset.width ? `${activeAsset.width} × ${activeAsset.height}px` : '—';
+    document.getElementById('d-size').textContent = fmtBytes(activeAsset.file_size_bytes);
+    document.getElementById('d-date').textContent = new Date(activeAsset.created_at).toLocaleString();
+    document.getElementById('d-usage').textContent = 'Checking…';
+    document.getElementById('detail-overlay').classList.add('open');
+    const usages = await vdCheckMediaUsage(activeAsset.id);
+    document.getElementById('d-usage').textContent = usages.length ? usages.join(', ') : 'Not currently used anywhere';
+  }
+  document.getElementById('btn-close-detail').addEventListener('click', () => document.getElementById('detail-overlay').classList.remove('open'));
+
+  document.getElementById('btn-copy-url').addEventListener('click', async () => {
+    await navigator.clipboard.writeText(activeAsset.public_url);
+    vdToast('Image URL copied to clipboard.', 'success');
+  });
+
+  document.getElementById('btn-save-alt').addEventListener('click', async () => {
+    const alt = document.getElementById('d-alt').value;
+    const { error } = await window.sb.from('media_assets').update({ alt_text: alt }).eq('id', activeAsset.id);
+    if (error) { vdToast('Could not save: ' + error.message, 'error'); return; }
+    vdToast('Alt text saved.', 'success');
+    loadAssets();
+  });
+
+  document.getElementById('btn-delete-asset').addEventListener('click', async () => {
+    const usages = await vdCheckMediaUsage(activeAsset.id);
+    const ok = await vdConfirm({
+      title: 'Delete this image?',
+      body: usages.length ? 'This image is currently being used — deleting it will remove it from those places too.' : 'This will permanently remove the file from storage.',
+      listItems: usages,
+      confirmLabel: 'Delete Permanently',
+    });
+    if (!ok) return;
+    const { error } = await vdDeleteMediaAsset(activeAsset);
+    if (error) { vdToast('Could not delete: ' + error.message, 'error'); return; }
+    await vdLogActivity('media.delete', 'media_asset', activeAsset.id, { filename: activeAsset.original_filename });
+    vdToast('Image deleted.', 'success');
+    document.getElementById('detail-overlay').classList.remove('open');
+    loadAssets();
+  });
+
+  // ── Drag-and-drop / click-to-upload into the general Media Library bucket ──
+  async function handleUploadFiles(fileList) {
+    const files = Array.from(fileList || []);
+    if (!files.length) return;
+    const progressEl = document.getElementById('ml-upload-progress');
+    const category = document.getElementById('ml-upload-category').value || 'media-library';
+    const altText = document.getElementById('ml-upload-alt').value.trim();
+    for (const file of files) {
+      progressEl.textContent = `Uploading ${file.name}…`;
+      const { data, error } = await vdUploadImage('media-library', 'general', file, category, (pct) => {
+        progressEl.textContent = `Uploading ${file.name}… ${pct}%`;
+      });
+      if (error) { vdToast(`${file.name}: ${error}`, 'error'); continue; }
+      if (altText) {
+        await window.sb.from('media_assets').update({ alt_text: altText }).eq('id', data.id);
+      }
+      await vdLogActivity('media.upload', 'media_asset', data.id, { filename: file.name });
+    }
+    progressEl.textContent = '';
+    document.getElementById('ml-file-input').value = '';
+    document.getElementById('ml-upload-alt').value = '';
+    vdToast('Upload and Publish complete ♡', 'success');
+    loadAssets();
+  }
+
+  const dropzone = document.getElementById('ml-dropzone');
+  document.getElementById('ml-file-input').addEventListener('change', (e) => handleUploadFiles(e.target.files));
+  ['dragenter', 'dragover'].forEach((evt) => dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); }));
+  ['dragleave', 'drop'].forEach((evt) => dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); }));
+  dropzone.addEventListener('drop', (e) => handleUploadFiles(e.dataTransfer.files));
+
+  (async function init() {
+    const admin = await vdRequireAdmin();
+    if (!admin) return;
+    document.getElementById('vd-admin-initial').textContent = (admin.full_name || admin.email).charAt(0).toUpperCase();
+    await loadAssets();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Admin Login — Val & Dan Kids Boutique</title>
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="admin.css" />
+<style>
+  body.vd-login { background: var(--pink-lt); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .vd-login-card { background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-lux); padding:40px 36px; width:100%; max-width:400px; }
+  .vd-login-logo { display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:26px; }
+  .vd-login-logo img { width:64px; height:64px; border-radius:50%; object-fit:cover; box-shadow:var(--shadow-sm); }
+  .vd-login-logo h1 { font-family:"Fraunces", serif; font-weight:500; font-size:19px; color:var(--ink); text-align:center; }
+  .vd-login-logo span { font-size:11.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--pink-dk); }
+  .vd-login-error { display:none; background:#FDECEC; color:#B23B3B; border:1px solid #F5C7C7; border-radius:var(--radius-sm); padding:11px 14px; font-size:13px; font-weight:600; margin-bottom:16px; }
+  .vd-login-error.show { display:block; }
+  .vd-login-links { display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:12.5px; }
+  .vd-login-links a { color:var(--pink-dk); font-weight:600; }
+  .vd-spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,.5); border-top-color:#fff; border-radius:50%; display:inline-block; animation:vd-spin .7s linear infinite; vertical-align:-3px; margin-right:8px; }
+  @keyframes vd-spin { to { transform:rotate(360deg); } }
+  .vd-back-link { display:block; text-align:center; margin-top:18px; font-size:12.5px; color:var(--ink-2); }
+</style>
+</head>
+<body class="vd-login">
+
+<div id="vd-config-warning" class="vd-config-warning" style="position:fixed; top:0; left:0; right:0; justify-content:center;">
+  ⚠️ Supabase isn't connected yet — edit <code>admin/js/config.js</code>. See README-ADMIN.md.
+</div>
+
+<div class="vd-login-card">
+  <div class="vd-login-logo">
+    <img src="../logo.jpg" alt="Val & Dan Kids Boutique" />
+    <h1>Val &amp; Dan Kids Boutique</h1>
+    <span>Admin Sign In</span>
+  </div>
+
+  <div id="vd-login-error" class="vd-login-error"></div>
+
+  <form id="vd-login-form">
+    <div class="vd-field">
+      <label for="vd-email">Email address</label>
+      <input type="email" id="vd-email" autocomplete="username" required />
+    </div>
+    <div class="vd-field">
+      <label for="vd-password">Password</label>
+      <div class="vd-password-wrap">
+        <input type="password" id="vd-password" autocomplete="current-password" required />
+        <button type="button" id="vd-toggle-pw">Show</button>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-full" id="vd-login-btn">Sign In</button>
+    <div class="vd-login-links">
+      <a href="#" id="vd-forgot-link">Forgot Password?</a>
+    </div>
+  </form>
+
+  <a href="../index.html" class="vd-back-link">← Back to the boutique</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/activity-log.js"></script>
+<script>
+  vdRequireSupabase();
+
+  const params = new URLSearchParams(location.search);
+  const reason = params.get('reason');
+  const errorBox = document.getElementById('vd-login-error');
+  if (reason === 'not-authorized') {
+    errorBox.textContent = 'That account is not approved for admin access. Contact the boutique owner if you believe this is a mistake.';
+    errorBox.classList.add('show');
+  }
+
+  // If already signed in as an approved admin, skip straight to the dashboard.
+  (async function checkExisting() {
+    if (!window.sb) return;
+    const { data: { session } } = await window.sb.auth.getSession();
+    if (!session) return;
+    const { data: adminRow } = await window.sb.from('admin_users').select('id').eq('id', session.user.id).maybeSingle();
+    if (adminRow) location.href = params.get('redirect') || 'dashboard.html';
+  })();
+
+  document.getElementById('vd-toggle-pw').addEventListener('click', function () {
+    const pw = document.getElementById('vd-password');
+    const isHidden = pw.type === 'password';
+    pw.type = isHidden ? 'text' : 'password';
+    this.textContent = isHidden ? 'Hide' : 'Show';
+  });
+
+  document.getElementById('vd-forgot-link').addEventListener('click', async function (e) {
+    e.preventDefault();
+    if (!window.sb) return;
+    const email = document.getElementById('vd-email').value.trim();
+    if (!email) {
+      errorBox.textContent = 'Enter your email address above first, then click "Forgot Password?" again.';
+      errorBox.classList.add('show');
+      return;
+    }
+    const { error } = await window.sb.auth.resetPasswordForEmail(email, {
+      redirectTo: location.origin + location.pathname.replace('login.html', 'reset-password.html'),
+    });
+    errorBox.classList.remove('show');
+    if (error) {
+      vdToastFallback('Could not send reset email: ' + error.message);
+    } else {
+      vdToastFallback('If that email has an admin account, a password reset link is on its way.');
+    }
+  });
+
+  function vdToastFallback(msg) {
+    errorBox.textContent = msg;
+    errorBox.classList.add('show');
+    errorBox.style.background = '#EAF3E3';
+    errorBox.style.color = '#4B7A38';
+    errorBox.style.borderColor = '#CFE6BE';
+  }
+
+  document.getElementById('vd-login-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    if (!window.sb) { errorBox.textContent = 'Backend not connected yet.'; errorBox.classList.add('show'); return; }
+
+    const email = document.getElementById('vd-email').value.trim();
+    const password = document.getElementById('vd-password').value;
+    const btn = document.getElementById('vd-login-btn');
+    errorBox.classList.remove('show');
+    errorBox.style.background = ''; errorBox.style.color = ''; errorBox.style.borderColor = '';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="vd-spinner"></span> Signing in…';
+
+    const { data, error } = await window.sb.auth.signInWithPassword({ email, password });
+
+    if (error || !data.session) {
+      errorBox.textContent = 'Invalid email or password.';
+      errorBox.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+      return;
+    }
+
+    const { data: adminRow } = await window.sb.from('admin_users').select('id').eq('id', data.user.id).maybeSingle();
+    if (!adminRow) {
+      await window.sb.auth.signOut();
+      errorBox.textContent = 'That account is not approved for admin access.';
+      errorBox.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+      return;
+    }
+
+    window.vdCurrentAdmin = adminRow;
+    await vdLogActivity('login', null, null, {});
+    location.href = params.get('redirect') || 'dashboard.html';
+  });
+</script>
+</body>
+</html>

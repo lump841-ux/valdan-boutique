@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contact Us — Val & Dan Kids Boutique</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- PROMO BAR -->
+<div class="promo-bar">
+  <div class="container">
+    <p>✨ Free shipping on all orders over $60 • Use code: <strong>LITTLEFERNS</strong> ✨</p>
+  </div>
+</div>
+
+<!-- PAGE NAV: plain bar (not overlaid on a photo) — matches the Figma
+     "[About & Contact] val-dan-contact" frame's navigation section. -->
+<div class="fig-page-nav-wrap">
+  <nav class="fig-nav">
+    <div class="fig-nav-left">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="collections.html">Collections</a>
+      <a href="about.html">Our Story</a>
+    </div>
+    <a href="index.html" class="fig-nav-logo">
+      <img src="logo-transparent.png" alt="Val &amp; Dan Kids Boutique" />
+    </a>
+    <div class="fig-nav-right">
+      <a href="shop.html" aria-label="Search">🔍</a>
+      <a href="account.html" aria-label="Account">👤</a>
+      <a href="cart.html" aria-label="Cart" class="fig-nav-cart">
+        🛍️<span class="fig-cart-badge" id="cart-count">0</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</div>
+
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="collections.html">Collections</a>
+  <a href="about.html">Our Story</a>
+</div>
+
+<!-- CONTACT MAIN: centered header → form card / info+map sidebar split →
+     FAQ list — matches the Figma "contact-main" exactly. -->
+<div class="fig-contact-main">
+  <div class="fig-contact-header">
+    <span class="eyebrow">We Love Hearing From You</span>
+    <h1>Get in Touch ♡</h1>
+    <p>Got a question about sizing, custom gift sets, or wholesale? Drop us a line and our team will help you out.</p>
+  </div>
+
+  <div class="fig-contact-split">
+    <div class="fig-contact-form-card">
+      <h2>Send Us a Note</h2>
+
+      <div class="fig-contact-msg success" id="contact-success">Thanks for reaching out! Your message has been sent — we'll be in touch soon.</div>
+      <div class="fig-contact-msg error" id="contact-error"></div>
+
+      <form id="contact-form">
+        <input type="text" name="company" class="fig-hp-field" tabindex="-1" autocomplete="off" />
+        <div class="fig-form-row">
+          <div class="fig-form-group"><label>First Name</label><input type="text" id="c-name" placeholder="e.g. Robin" required /></div>
+          <div class="fig-form-group"><label>Email Address</label><input type="email" id="c-email" placeholder="hello@valdandan.com" required /></div>
+        </div>
+        <div class="fig-form-row">
+          <div class="fig-form-group"><label>Phone (optional)</label><input type="tel" id="c-phone" /></div>
+          <div class="fig-form-group"><label>Subject</label><input type="text" id="c-subject" placeholder="Subject" /></div>
+        </div>
+        <div class="fig-form-group">
+          <label>Your Message</label>
+          <textarea id="c-message" placeholder="We aim to answer every question within 24 hours. Please share your details." required></textarea>
+        </div>
+        <button type="submit" class="fig-contact-submit-btn" id="contact-submit-btn">Send Message ♡</button>
+      </form>
+    </div>
+
+    <div class="fig-contact-info-col">
+      <div class="fig-contact-info-card">
+        <h3>Boutique Details</h3>
+        <div class="fig-contact-detail-list">
+          <div class="fig-contact-detail-row"><span class="ic">📍</span><div>234 Oakwood Lane, Suite 4, Fernwood, OR 97210</div></div>
+          <div class="fig-contact-detail-row"><span class="ic">📞</span><div data-vd-content="contact_phone">+1 (503) 555-FERN (Mon–Fri: 10am–6pm PST)</div></div>
+          <div class="fig-contact-detail-row"><span class="ic">✉️</span><a href="mailto:hello@valdandan.com" data-vd-content="contact_email">hello@valdandan.com</a></div>
+        </div>
+        <h3 style="margin-top:4px;">Follow Along</h3>
+        <div class="fig-contact-social">
+          <a href="#" data-vd-content-href="social_instagram">📷</a>
+          <a href="#" data-vd-content-href="social_facebook">📘</a>
+          <a href="#" data-vd-content-href="social_pinterest">📌</a>
+        </div>
+      </div>
+      <div class="fig-contact-map-card">
+        <img src="contact-map.jpg" alt="Map to the Val &amp; Dan Kids Boutique storefront" />
+      </div>
+    </div>
+  </div>
+
+  <div class="fig-contact-faq">
+    <h2>Frequently Asked Questions ♡</h2>
+    <div class="fig-contact-faq-grid">
+      <div class="fig-contact-faq-card">
+        <div class="fig-contact-faq-q">
+          <h4>Are your fabrics hypoallergenic and GOTS-certified?</h4>
+          <span class="fig-contact-faq-chevron">▾</span>
+        </div>
+        <p>Yes, absolutely. Every Val &amp; Dan garment is crafted from GOTS-certified organic cotton. Our fabrics are independently lab-tested to be free from harsh chemicals, synthetic dyes, and common allergens — making them safe for even the most sensitive little skin.</p>
+      </div>
+      <div class="fig-contact-faq-card">
+        <div class="fig-contact-faq-q">
+          <h4>How does sizing work for babies and toddlers?</h4>
+          <span class="fig-contact-faq-chevron">▾</span>
+        </div>
+        <p>Our collections are sized by age range (Newborn, 0-3M, 3-6M, 6-12M, 12-18M, 18-24M, 2-3Y) and each product page includes a detailed fit guide. If you're between sizes, we recommend sizing up for room to grow.</p>
+      </div>
+      <div class="fig-contact-faq-card">
+        <div class="fig-contact-faq-q">
+          <h4>What is your returns and exchange policy?</h4>
+          <span class="fig-contact-faq-chevron">▾</span>
+        </div>
+        <p>We want every Val &amp; Dan purchase to feel right. If something doesn't work, unworn items in original packaging can be returned or exchanged within 30 days of delivery. Exchanges are always free.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="fig-footer">
+  <div class="container">
+    <div class="fig-footer-cols">
+      <div class="fig-footer-brand">
+        <h3>Val &amp; Dan's Kids Boutique</h3>
+        <p>Crafting premium organic children's wear that honors soft skin and sweet moments. Beautiful styles created sustainably.</p>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All Clothing</a></li>
+          <li><a href="shop.html?category=Boys">Baby Rompers</a></li>
+          <li><a href="shop.html?category=Gift+Sets">Gift Sets</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Help</h4>
+        <ul>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">Shipping &amp; Returns</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col fig-footer-subscribe">
+        <h4>Subscribe</h4>
+        <p>Join our newsletter for sweet deals &amp; storybook updates.</p>
+        <form onsubmit="event.preventDefault(); showToast('Welcome to the family! Check your inbox 💗'); this.reset();">
+          <input type="email" placeholder="Your email address" required />
+          <button type="submit" class="fig-footer-subscribe-btn" aria-label="Subscribe">→</button>
+        </form>
+      </div>
+    </div>
+    <div class="fig-footer-rule"></div>
+    <div class="fig-footer-bottom">
+      <span>© 2025 Val &amp; Dan Kids Boutique. All rights reserved.</span>
+      <span>Privacy Policy • Terms of Service</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="site-data.js"></script>
+<script src="shop.js"></script>
+<script>
+  vdApplySiteContent();
+
+  document.getElementById('contact-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const btn = document.getElementById('contact-submit-btn');
+    const successBox = document.getElementById('contact-success');
+    const errorBox = document.getElementById('contact-error');
+    successBox.classList.remove('show');
+    errorBox.classList.remove('show');
+
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    const result = await vdSubmitContactForm({
+      name: document.getElementById('c-name').value.trim(),
+      email: document.getElementById('c-email').value.trim(),
+      phone: document.getElementById('c-phone').value.trim(),
+      subject: document.getElementById('c-subject').value.trim(),
+      message: document.getElementById('c-message').value.trim(),
+      company: this.company.value, // honeypot
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'Send Message ♡';
+
+    if (result.ok) {
+      successBox.classList.add('show');
+      this.reset();
+    } else {
+      errorBox.textContent = result.error || 'Something went wrong. Please try again.';
+      errorBox.classList.add('show');
+    }
+  });
+</script>
+</body>
+</html>

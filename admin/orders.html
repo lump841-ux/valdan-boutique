@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Orders — Val & Dan Admin</title>
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="admin.css" />
+<style>
+  .vd-order-row { padding:16px; border:1.5px solid var(--border); border-radius:var(--radius-sm); margin-bottom:10px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .vd-order-row:hover { border-color:var(--pink); }
+  .vd-order-row .who strong { font-size:14px; color:var(--ink); display:block; }
+  .vd-order-row .who span { font-size:12px; color:var(--ink-3); }
+  .vd-order-row .num { font-size:12.5px; font-weight:800; color:var(--pink); }
+  .vd-order-row .total { font-size:14px; font-weight:800; }
+  .vd-status-pill { font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.4px; padding:4px 10px; border-radius:50px; }
+  .vd-status-pill.received { background:var(--blue-lt); color:var(--blue); }
+  .vd-status-pill.processing { background:var(--tan-lt); color:var(--tan); }
+  .vd-status-pill.shipped { background:var(--lavender-lt); color:var(--purple); }
+  .vd-status-pill.delivered { background:var(--sage-lt); color:var(--sage); }
+  .vd-status-pill.cancelled { background:#F4E1E1; color:#B23A3A; }
+  .vd-detail-overlay { position:fixed; inset:0; background:rgba(43,34,48,.45); z-index:850; display:none; align-items:center; justify-content:center; padding:20px; }
+  .vd-detail-overlay.open { display:flex; }
+  .vd-detail-modal { background:#fff; border-radius:var(--radius); padding:26px; max-width:560px; width:100%; box-shadow:var(--shadow-lux); max-height:88vh; overflow:auto; }
+  .vd-order-item-row { display:flex; justify-content:space-between; font-size:13px; color:var(--ink-2); padding:6px 0; border-bottom:1px solid var(--border); }
+  .vd-order-item-row:last-child { border-bottom:none; }
+</style>
+</head>
+<body class="vd-admin">
+<div id="vd-config-warning" class="vd-config-warning">⚠️ Supabase isn't connected yet — edit <code>admin/js/config.js</code>. See README-ADMIN.md.</div>
+
+<div class="vd-shell">
+  <aside class="vd-sidebar" id="vd-sidebar">
+    <div class="vd-sidebar-logo"><img src="../logo.jpg" alt="Val & Dan Kids Boutique" /><div><span>Val &amp; Dan</span><small>Admin</small></div></div>
+    <nav class="vd-nav">
+      <a href="dashboard.html"><span class="ic">🏠</span> Dashboard</a>
+      <a href="hero-images.html"><span class="ic">🖼️</span> Hero Images</a>
+      <a href="products.html"><span class="ic">👕</span> Products</a>
+      <a href="orders.html" class="active"><span class="ic">📦</span> Orders</a>
+      <a href="collections.html"><span class="ic">🎀</span> Collections</a>
+      <a href="new-arrivals.html"><span class="ic">✨</span> New Arrivals</a>
+      <a href="media-library.html"><span class="ic">🗂️</span> Media Library</a>
+      <a href="content.html"><span class="ic">📝</span> Website Content</a>
+      <a href="messages.html"><span class="ic">✉️</span> Messages</a>
+      <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
+      <a href="#" class="vd-nav-logout" data-vd-logout><span class="ic">🚪</span> Log Out</a>
+    </nav>
+  </aside>
+
+  <div class="vd-main">
+    <div class="vd-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="vd-mobile-nav-toggle" aria-label="Menu">☰</button>
+        <div><h1>Orders</h1><div class="vd-topbar-sub">Everything placed through the public checkout flow.</div></div>
+      </div>
+      <div class="vd-topbar-right"><div class="vd-admin-chip"><span class="avatar" id="vd-admin-initial">A</span><span id="vd-admin-name">…</span></div></div>
+    </div>
+
+    <div class="vd-content">
+      <div class="vd-stat-grid">
+        <div class="vd-stat-card"><div class="num" id="stat-total">–</div><div class="lbl">Total Orders</div></div>
+        <div class="vd-stat-card"><div class="num" id="stat-received">–</div><div class="lbl">Awaiting Processing</div></div>
+        <div class="vd-stat-card"><div class="num" id="stat-shipped">–</div><div class="lbl">Shipped</div></div>
+        <div class="vd-stat-card"><div class="num" id="stat-revenue">–</div><div class="lbl">Revenue (all orders)</div></div>
+      </div>
+
+      <div class="vd-card">
+        <div class="vd-toolbar">
+          <input type="text" class="vd-search" id="search-input" placeholder="Search order #, name, or email…" />
+          <select id="filter-status">
+            <option value="">All Statuses</option>
+            <option value="received">Received</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <p id="result-count" style="font-size:12.5px;color:var(--ink-2);margin-bottom:14px;">Loading…</p>
+        <div id="order-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="vd-detail-overlay" id="detail-overlay">
+  <div class="vd-detail-modal">
+    <div class="vd-card-hd" style="margin-bottom:14px;">
+      <div><h2 id="d-num" style="font-family:'Fraunces',serif;font-size:18px;"></h2><p id="d-date" style="font-size:12px;color:var(--ink-3);"></p></div>
+      <span class="vd-status-pill" id="d-badge"></span>
+    </div>
+    <p style="font-size:13px;color:var(--ink-2);margin-bottom:4px;"><strong>Customer:</strong> <span id="d-name"></span></p>
+    <p style="font-size:13px;color:var(--ink-2);margin-bottom:4px;"><strong>Email:</strong> <a href="#" id="d-email"></a></p>
+    <p style="font-size:13px;color:var(--ink-2);margin-bottom:14px;" id="d-phone-row"><strong>Phone:</strong> <span id="d-phone"></span></p>
+    <p style="font-size:13px;color:var(--ink-2);margin-bottom:14px;background:var(--beige);border-radius:10px;padding:12px;" id="d-address"></p>
+
+    <div id="d-items" style="margin-bottom:14px;"></div>
+
+    <div style="font-size:13.5px;color:var(--ink-2);margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;"><span>Subtotal</span><span id="d-subtotal"></span></div>
+      <div style="display:flex;justify-content:space-between;"><span>Shipping</span><span id="d-shipping"></span></div>
+      <div style="display:flex;justify-content:space-between;font-weight:800;color:var(--ink);border-top:1px solid var(--border);margin-top:6px;padding-top:8px;"><span>Total</span><span id="d-total"></span></div>
+    </div>
+
+    <div class="checkout-field" style="margin-bottom:16px;">
+      <label style="display:block;font-size:12.5px;font-weight:700;color:var(--ink-2);margin-bottom:6px;">Update Status</label>
+      <select id="d-status-select" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);">
+        <option value="received">Received</option>
+        <option value="processing">Processing</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+
+    <div class="vd-btn-row">
+      <button class="btn btn-outline btn-sm" id="btn-close">Close</button>
+      <button class="btn btn-primary btn-sm" id="btn-save-status">Save Status</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/activity-log.js"></script>
+<script>
+  let allOrders = [];
+  let activeOrder = null;
+
+  async function loadOrders() {
+    const search = document.getElementById('search-input').value.trim().toLowerCase();
+    const status = document.getElementById('filter-status').value;
+    let q = window.sb.from('orders').select('*').order('created_at', { ascending: false });
+    if (status) q = q.eq('status', status);
+    const { data, error } = await q;
+    allOrders = data || [];
+    if (search) {
+      allOrders = allOrders.filter((o) =>
+        (o.order_number || '').toLowerCase().includes(search) ||
+        (o.customer_name || '').toLowerCase().includes(search) ||
+        (o.email || '').toLowerCase().includes(search));
+    }
+    renderStats(data || []);
+    render();
+    if (error) vdToast('Could not load orders: ' + error.message, 'error');
+  }
+
+  function renderStats(orders) {
+    document.getElementById('stat-total').textContent = orders.length;
+    document.getElementById('stat-received').textContent = orders.filter((o) => o.status === 'received').length;
+    document.getElementById('stat-shipped').textContent = orders.filter((o) => o.status === 'shipped').length;
+    const revenue = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
+    document.getElementById('stat-revenue').textContent = '$' + revenue.toFixed(2);
+  }
+
+  function render() {
+    document.getElementById('result-count').textContent = allOrders.length + (allOrders.length === 1 ? ' order' : ' orders');
+    const wrap = document.getElementById('order-list');
+    if (!allOrders.length) { wrap.innerHTML = '<p class="hint">No orders yet — they\'ll appear here as customers check out.</p>'; return; }
+    wrap.innerHTML = allOrders.map((o) => `
+      <div class="vd-order-row" data-id="${o.id}">
+        <div class="who">
+          <strong>${o.customer_name}</strong>
+          <span>${o.email} · ${new Date(o.created_at).toLocaleDateString()}</span>
+        </div>
+        <div class="num">#${o.order_number}</div>
+        <span class="vd-status-pill ${o.status}">${o.status}</span>
+        <div class="total">$${Number(o.total).toFixed(2)}</div>
+      </div>`).join('');
+    wrap.querySelectorAll('.vd-order-row').forEach((row) => row.addEventListener('click', () => openOrder(row.getAttribute('data-id'))));
+  }
+
+  function openOrder(id) {
+    activeOrder = allOrders.find((o) => o.id === id);
+    if (!activeOrder) return;
+    document.getElementById('d-num').textContent = 'Order #' + activeOrder.order_number;
+    document.getElementById('d-date').textContent = new Date(activeOrder.created_at).toLocaleString();
+    document.getElementById('d-name').textContent = activeOrder.customer_name;
+    document.getElementById('d-email').textContent = activeOrder.email;
+    document.getElementById('d-email').href = 'mailto:' + activeOrder.email;
+    document.getElementById('d-phone-row').style.display = activeOrder.phone ? 'block' : 'none';
+    document.getElementById('d-phone').textContent = activeOrder.phone || '';
+    const addr = activeOrder.shipping_address || {};
+    document.getElementById('d-address').textContent = [addr.line1, addr.line2, [addr.city, addr.state, addr.zip].filter(Boolean).join(', '), addr.country].filter(Boolean).join(' · ');
+    const badge = document.getElementById('d-badge');
+    badge.className = 'vd-status-pill ' + activeOrder.status;
+    badge.textContent = activeOrder.status;
+    document.getElementById('d-status-select').value = activeOrder.status;
+
+    const items = activeOrder.items || [];
+    document.getElementById('d-items').innerHTML = items.map((it) => `
+      <div class="vd-order-item-row">
+        <span>${it.name}${it.size ? ' (' + it.size + ')' : ''} × ${it.qty}</span>
+        <span>$${(Number(it.price) * Number(it.qty)).toFixed(2)}</span>
+      </div>`).join('');
+
+    document.getElementById('d-subtotal').textContent = '$' + Number(activeOrder.subtotal).toFixed(2);
+    document.getElementById('d-shipping').textContent = Number(activeOrder.shipping_cost) === 0 ? 'Free' : '$' + Number(activeOrder.shipping_cost).toFixed(2);
+    document.getElementById('d-total').textContent = '$' + Number(activeOrder.total).toFixed(2);
+
+    document.getElementById('detail-overlay').classList.add('open');
+  }
+  document.getElementById('btn-close').addEventListener('click', () => document.getElementById('detail-overlay').classList.remove('open'));
+
+  document.getElementById('btn-save-status').addEventListener('click', async () => {
+    const newStatus = document.getElementById('d-status-select').value;
+    const { error } = await window.sb.from('orders').update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', activeOrder.id);
+    if (error) { vdToast('Could not update: ' + error.message, 'error'); return; }
+    await vdLogActivity('order.status', 'order', activeOrder.id, { status: newStatus });
+    vdToast('Order marked as ' + newStatus + '.', 'success');
+    document.getElementById('detail-overlay').classList.remove('open');
+    loadOrders();
+  });
+
+  document.getElementById('search-input').addEventListener('input', debounce(loadOrders, 300));
+  document.getElementById('filter-status').addEventListener('change', loadOrders);
+  function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+  (async function init() {
+    const admin = await vdRequireAdmin();
+    if (!admin) return;
+    document.getElementById('vd-admin-initial').textContent = (admin.full_name || admin.email).charAt(0).toUpperCase();
+    await loadOrders();
+  })();
+</script>
+</body>
+</html>

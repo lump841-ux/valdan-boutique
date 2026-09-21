@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Collections — Val & Dan Admin</title>
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="admin.css" />
+<style>
+  .vd-editor { display:none; } .vd-editor.open { display:block; }
+  .vd-upload-drop { border:2px dashed var(--border); border-radius:var(--radius-sm); padding:22px; text-align:center; color:var(--ink-2); font-size:13px; cursor:pointer; display:block; }
+  .vd-upload-drop:hover { border-color:var(--pink); background:var(--pink-lt); }
+  .vd-cover-preview { width:100%; max-width:280px; border-radius:var(--radius-sm); display:block; margin-bottom:10px; }
+</style>
+</head>
+<body class="vd-admin">
+<div id="vd-config-warning" class="vd-config-warning">⚠️ Supabase isn't connected yet — edit <code>admin/js/config.js</code>. See README-ADMIN.md.</div>
+
+<div class="vd-shell">
+  <aside class="vd-sidebar" id="vd-sidebar">
+    <div class="vd-sidebar-logo"><img src="../logo.jpg" alt="Val & Dan Kids Boutique" /><div><span>Val &amp; Dan</span><small>Admin</small></div></div>
+    <nav class="vd-nav">
+      <a href="dashboard.html"><span class="ic">🏠</span> Dashboard</a>
+      <a href="hero-images.html"><span class="ic">🖼️</span> Hero Images</a>
+      <a href="products.html"><span class="ic">👕</span> Products</a>
+      <a href="orders.html"><span class="ic">📦</span> Orders</a>
+      <a href="collections.html" class="active"><span class="ic">🎀</span> Collections</a>
+      <a href="new-arrivals.html"><span class="ic">✨</span> New Arrivals</a>
+      <a href="media-library.html"><span class="ic">🗂️</span> Media Library</a>
+      <a href="content.html"><span class="ic">📝</span> Website Content</a>
+      <a href="messages.html"><span class="ic">✉️</span> Messages</a>
+      <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
+      <a href="#" class="vd-nav-logout" data-vd-logout><span class="ic">🚪</span> Log Out</a>
+    </nav>
+  </aside>
+
+  <div class="vd-main">
+    <div class="vd-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="vd-mobile-nav-toggle" aria-label="Menu">☰</button>
+        <div><h1>Collections</h1><div class="vd-topbar-sub">Group products into curated collections.</div></div>
+      </div>
+      <div class="vd-topbar-right"><div class="vd-admin-chip"><span class="avatar" id="vd-admin-initial">A</span><span id="vd-admin-name">…</span></div></div>
+    </div>
+
+    <div class="vd-content">
+      <div class="vd-card">
+        <div class="vd-card-hd">
+          <div><h2>All Collections</h2><p id="result-count">Loading…</p></div>
+          <button class="btn btn-primary btn-sm" id="btn-add">+ Add Collection</button>
+        </div>
+        <table class="vd-table">
+          <thead><tr><th></th><th>Title</th><th>Products</th><th>Status</th><th>Homepage</th><th></th></tr></thead>
+          <tbody id="rows"><tr class="vd-empty-row"><td colspan="6">Loading…</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="vd-editor" id="editor">
+        <div class="vd-card">
+          <div class="vd-card-hd">
+            <div><h2 id="editor-title">Add Collection</h2></div>
+            <span class="vd-badge draft" id="editor-badge">New</span>
+          </div>
+
+          <div class="vd-field-row">
+            <div>
+              <div class="vd-field">
+                <label>Cover Image</label>
+                <img id="cover-preview" class="vd-cover-preview" style="display:none" />
+                <label class="vd-upload-drop" for="cover-input">📤 Click to upload a cover photo</label>
+                <input type="file" id="cover-input" accept="image/jpeg,image/jpg,image/png,image/webp" style="display:none" />
+                <div class="vd-progress" id="upload-progress"><div class="vd-progress-bar" id="upload-progress-bar"></div></div>
+              </div>
+            </div>
+            <div>
+              <div class="vd-field"><label>Collection Title</label><input type="text" id="f-title" /></div>
+              <div class="vd-field"><label>Description</label><textarea id="f-desc"></textarea></div>
+              <div class="vd-field"><label>Status</label>
+                <select id="f-status"><option value="draft">Draft</option><option value="published">Published</option><option value="archived">Archived (hidden)</option></select>
+              </div>
+              <div class="vd-checkbox-row"><input type="checkbox" id="f-homepage" /><label for="f-homepage">Show on Homepage</label></div>
+            </div>
+          </div>
+
+          <div class="vd-field">
+            <label>Products in this Collection (drag to reorder)</label>
+            <div class="vd-drag-list" id="product-list"></div>
+            <select id="add-product-select" style="margin-top:10px;width:100%;">
+              <option value="">+ Add a product to this collection…</option>
+            </select>
+          </div>
+
+          <div class="vd-btn-row" style="margin-top:16px;">
+            <button class="btn btn-outline btn-sm" id="btn-cancel">Cancel</button>
+            <button class="btn btn-outline btn-sm" id="btn-delete" style="display:none;">Delete Collection</button>
+            <button class="btn btn-outline btn-sm" id="btn-save-draft">Save as Draft</button>
+            <button class="btn btn-primary btn-sm" id="btn-publish">Save &amp; Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/upload.js"></script>
+<script src="js/activity-log.js"></script>
+<script>
+  let allCollections = [];
+  let allProducts = [];
+  let editingId = null;
+  let coverAsset = null;
+  let collProducts = []; // [{product_id, name, sort_order}]
+
+  function slugify(s) { return (s || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
+
+  async function loadAllProducts() {
+    const { data } = await window.sb.from('products').select('id, name').order('name');
+    allProducts = data || [];
+  }
+
+  async function loadCollections() {
+    const { data, error } = await window.sb
+      .from('collections')
+      .select('*, media_assets(public_url), collection_products(id)')
+      .order('sort_order');
+    allCollections = data || [];
+    document.getElementById('result-count').textContent = allCollections.length + (allCollections.length === 1 ? ' collection' : ' collections');
+    const tbody = document.getElementById('rows');
+    if (!allCollections.length) { tbody.innerHTML = '<tr class="vd-empty-row"><td colspan="6">No collections yet.</td></tr>'; return; }
+    tbody.innerHTML = allCollections.map((c) => `
+      <tr>
+        <td>${c.media_assets?.public_url ? `<img class="thumb" src="${c.media_assets.public_url}" alt="" />` : ''}</td>
+        <td>${c.title}</td>
+        <td>${c.collection_products?.length || 0}</td>
+        <td><span class="vd-badge ${c.status}">${c.status}</span></td>
+        <td>${c.show_on_homepage ? '✔️' : '—'}</td>
+        <td class="vd-table-actions"><button data-edit="${c.id}">Edit</button><button class="danger" data-del="${c.id}">Delete</button></td>
+      </tr>`).join('');
+    tbody.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => openEditor(b.getAttribute('data-edit'))));
+    tbody.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => deleteCollection(b.getAttribute('data-del'))));
+    if (error) vdToast('Could not load collections: ' + error.message, 'error');
+  }
+
+  function renderProductList() {
+    const list = document.getElementById('product-list');
+    if (!collProducts.length) { list.innerHTML = '<p class="hint">No products assigned yet.</p>'; }
+    else {
+      list.innerHTML = collProducts.map((cp, idx) => `
+        <div class="vd-drag-item" draggable="true" data-idx="${idx}">
+          <span class="vd-drag-handle">⠿</span>
+          <span style="flex:1;font-size:13.5px;font-weight:600;">${cp.name}</span>
+          <button type="button" data-remove-idx="${idx}" style="color:#C4423D;font-size:12px;font-weight:700;">Remove</button>
+        </div>`).join('');
+      list.querySelectorAll('[data-remove-idx]').forEach((btn) => btn.addEventListener('click', () => {
+        collProducts.splice(Number(btn.getAttribute('data-remove-idx')), 1);
+        renderProductList();
+      }));
+      let dragIdx = null;
+      list.querySelectorAll('.vd-drag-item').forEach((item) => {
+        item.addEventListener('dragstart', () => { dragIdx = Number(item.getAttribute('data-idx')); item.classList.add('dragging'); });
+        item.addEventListener('dragend', () => item.classList.remove('dragging'));
+        item.addEventListener('dragover', (e) => e.preventDefault());
+        item.addEventListener('drop', () => {
+          const dropIdx = Number(item.getAttribute('data-idx'));
+          if (dragIdx === null || dragIdx === dropIdx) return;
+          const moved = collProducts.splice(dragIdx, 1)[0];
+          collProducts.splice(dropIdx, 0, moved);
+          renderProductList();
+        });
+      });
+    }
+    const sel = document.getElementById('add-product-select');
+    const assignedIds = collProducts.map((c) => c.product_id);
+    sel.innerHTML = '<option value="">+ Add a product to this collection…</option>' +
+      allProducts.filter((p) => !assignedIds.includes(p.id)).map((p) => `<option value="${p.id}">${p.name}</option>`).join('');
+  }
+  document.getElementById('add-product-select').addEventListener('change', (e) => {
+    const id = e.target.value;
+    if (!id) return;
+    const p = allProducts.find((x) => x.id === id);
+    collProducts.push({ product_id: id, name: p.name });
+    e.target.value = '';
+    renderProductList();
+  });
+
+  document.getElementById('cover-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const err = vdValidateImageFile(file);
+    if (err) { vdToast(err, 'error'); e.target.value = ''; return; }
+    const progressWrap = document.getElementById('upload-progress');
+    const progressBar = document.getElementById('upload-progress-bar');
+    progressWrap.style.display = 'block'; e.target.disabled = true;
+    const folder = editingId || 'new-' + Date.now();
+    const { data: asset, error } = await vdUploadImage('collections', folder, file, 'collection', (pct) => { progressBar.style.width = pct + '%'; });
+    e.target.disabled = false; e.target.value = '';
+    setTimeout(() => { progressWrap.style.display = 'none'; progressBar.style.width = '0%'; }, 500);
+    if (error) { vdToast(error, 'error'); return; }
+    coverAsset = asset;
+    const img = document.getElementById('cover-preview');
+    img.src = asset.public_url; img.style.display = 'block';
+    vdToast('Cover image uploaded successfully.', 'success');
+  });
+
+  function resetForm() {
+    editingId = null; coverAsset = null; collProducts = [];
+    document.getElementById('f-title').value = '';
+    document.getElementById('f-desc').value = '';
+    document.getElementById('f-status').value = 'draft';
+    document.getElementById('f-homepage').checked = false;
+    document.getElementById('cover-preview').style.display = 'none';
+    document.getElementById('editor-title').textContent = 'Add Collection';
+    document.getElementById('editor-badge').className = 'vd-badge draft';
+    document.getElementById('editor-badge').textContent = 'New';
+    document.getElementById('btn-delete').style.display = 'none';
+    renderProductList();
+  }
+
+  async function openEditor(id) {
+    resetForm();
+    document.getElementById('editor').classList.add('open');
+    if (id) {
+      editingId = id;
+      const { data: c } = await window.sb.from('collections').select('*, media_assets(public_url)').eq('id', id).single();
+      const { data: links } = await window.sb.from('collection_products').select('product_id, sort_order, products(name)').eq('collection_id', id).order('sort_order');
+      document.getElementById('f-title').value = c.title;
+      document.getElementById('f-desc').value = c.description || '';
+      document.getElementById('f-status').value = c.status;
+      document.getElementById('f-homepage').checked = c.show_on_homepage;
+      if (c.media_assets?.public_url) {
+        coverAsset = { id: c.media_asset_id, public_url: c.media_assets.public_url };
+        const img = document.getElementById('cover-preview');
+        img.src = c.media_assets.public_url; img.style.display = 'block';
+      }
+      collProducts = (links || []).map((l) => ({ product_id: l.product_id, name: l.products?.name || 'Unknown product' }));
+      renderProductList();
+      document.getElementById('editor-title').textContent = 'Edit — ' + c.title;
+      const b = document.getElementById('editor-badge'); b.className = 'vd-badge ' + c.status; b.textContent = c.status;
+      document.getElementById('btn-delete').style.display = 'inline-flex';
+    }
+    document.getElementById('editor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.getElementById('btn-add').addEventListener('click', () => openEditor(null));
+  document.getElementById('btn-cancel').addEventListener('click', () => document.getElementById('editor').classList.remove('open'));
+
+  async function saveCollection(status) {
+    const title = document.getElementById('f-title').value.trim();
+    if (!title) { vdToast('Collection title is required.', 'error'); return false; }
+    const payload = {
+      title,
+      slug: slugify(title) + (editingId ? '' : '-' + Date.now().toString(36)),
+      description: document.getElementById('f-desc').value.trim(),
+      media_asset_id: coverAsset ? coverAsset.id : null,
+      status,
+      show_on_homepage: document.getElementById('f-homepage').checked,
+      updated_by: window.vdCurrentAdmin.id,
+    };
+    let id = editingId;
+    if (id) {
+      const { error } = await window.sb.from('collections').update(payload).eq('id', id);
+      if (error) { vdToast('Could not save: ' + error.message, 'error'); return false; }
+    } else {
+      payload.created_by = window.vdCurrentAdmin.id;
+      const { data, error } = await window.sb.from('collections').insert(payload).select().single();
+      if (error) { vdToast('Could not save: ' + error.message, 'error'); return false; }
+      id = data.id;
+    }
+    await window.sb.from('collection_products').delete().eq('collection_id', id);
+    if (collProducts.length) {
+      await window.sb.from('collection_products').insert(collProducts.map((cp, idx) => ({ collection_id: id, product_id: cp.product_id, sort_order: idx })));
+    }
+    await vdLogActivity(editingId ? 'collection.update' : 'collection.create', 'collection', id, { title });
+    return true;
+  }
+
+  document.getElementById('btn-save-draft').addEventListener('click', async (e) => {
+    const btn = e.currentTarget; btn.disabled = true; btn.textContent = 'Saving…';
+    const ok = await saveCollection('draft');
+    btn.disabled = false; btn.textContent = 'Save as Draft';
+    if (ok) { vdToast('Changes saved as a draft.', 'success'); document.getElementById('editor').classList.remove('open'); loadCollections(); }
+  });
+  document.getElementById('btn-publish').addEventListener('click', async (e) => {
+    const btn = e.currentTarget; btn.disabled = true; btn.textContent = 'Publishing…';
+    const ok = await saveCollection('published');
+    btn.disabled = false; btn.textContent = 'Save & Publish';
+    if (ok) { vdToast('Collection published successfully.', 'success'); document.getElementById('editor').classList.remove('open'); loadCollections(); }
+  });
+
+  async function deleteCollection(id) {
+    const c = allCollections.find((x) => x.id === id);
+    const ok = await vdConfirm({ title: 'Delete this collection?', body: `"${c?.title}" will be removed. Its products will stay in the shop; only the grouping is deleted.`, confirmLabel: 'Delete Collection' });
+    if (!ok) return;
+    const { error } = await window.sb.from('collections').delete().eq('id', id);
+    if (error) { vdToast('Could not delete: ' + error.message, 'error'); return; }
+    await vdLogActivity('collection.delete', 'collection', id, { title: c?.title });
+    vdToast('Collection deleted.', 'success');
+    document.getElementById('editor').classList.remove('open');
+    loadCollections();
+  }
+  document.getElementById('btn-delete').addEventListener('click', () => deleteCollection(editingId));
+
+  (async function init() {
+    const admin = await vdRequireAdmin();
+    if (!admin) return;
+    document.getElementById('vd-admin-initial').textContent = (admin.full_name || admin.email).charAt(0).toUpperCase();
+    await loadAllProducts();
+    await loadCollections();
+  })();
+</script>
+</body>
+</html>

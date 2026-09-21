@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Hero Images — Val & Dan Admin</title>
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="admin.css" />
+<style>
+  .vd-page-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:26px; }
+  .vd-page-card { background:#fff; border:1.5px solid var(--border); border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:.18s ease; }
+  .vd-page-card:hover { border-color:var(--pink); box-shadow:var(--shadow-sm); }
+  .vd-page-card.active { border-color:var(--pink); box-shadow:0 0 0 3px var(--pink-lt); }
+  .vd-page-card .thumb { width:100%; height:110px; object-fit:cover; background:var(--beige); display:block; }
+  .vd-page-card .thumb-empty { width:100%; height:110px; display:flex; align-items:center; justify-content:center; background:var(--beige); color:var(--ink-3); font-size:12px; }
+  .vd-page-card .body { padding:12px 14px; }
+  .vd-page-card .name { font-weight:700; font-size:14px; color:var(--ink); margin-bottom:4px; }
+  .vd-editor { display:none; }
+  .vd-editor.open { display:block; }
+  .vd-editor-grid { display:grid; grid-template-columns:1fr 320px; gap:26px; }
+  @media (max-width:900px) { .vd-editor-grid { grid-template-columns:1fr; } .vd-page-grid { grid-template-columns:repeat(2,1fr); } }
+  .vd-meta-row { font-size:12px; color:var(--ink-3); margin-top:10px; }
+  .vd-upload-drop { border:2px dashed var(--border); border-radius:var(--radius-sm); padding:26px; text-align:center; color:var(--ink-2); font-size:13px; cursor:pointer; }
+  .vd-upload-drop:hover { border-color:var(--pink); background:var(--pink-lt); }
+  .vd-progress { height:6px; background:var(--border); border-radius:4px; overflow:hidden; margin-top:10px; display:none; }
+  .vd-progress-bar { height:100%; background:var(--pink); width:0%; transition:.2s ease; }
+</style>
+</head>
+<body class="vd-admin">
+<div id="vd-config-warning" class="vd-config-warning">⚠️ Supabase isn't connected yet — edit <code>admin/js/config.js</code>. See README-ADMIN.md.</div>
+
+<div class="vd-shell">
+  <aside class="vd-sidebar" id="vd-sidebar">
+    <div class="vd-sidebar-logo"><img src="../logo.jpg" alt="Val & Dan Kids Boutique" /><div><span>Val &amp; Dan</span><small>Admin</small></div></div>
+    <nav class="vd-nav">
+      <a href="dashboard.html"><span class="ic">🏠</span> Dashboard</a>
+      <a href="hero-images.html" class="active"><span class="ic">🖼️</span> Hero Images</a>
+      <a href="products.html"><span class="ic">👕</span> Products</a>
+      <a href="orders.html"><span class="ic">📦</span> Orders</a>
+      <a href="collections.html"><span class="ic">🎀</span> Collections</a>
+      <a href="new-arrivals.html"><span class="ic">✨</span> New Arrivals</a>
+      <a href="media-library.html"><span class="ic">🗂️</span> Media Library</a>
+      <a href="content.html"><span class="ic">📝</span> Website Content</a>
+      <a href="messages.html"><span class="ic">✉️</span> Messages</a>
+      <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
+      <a href="#" class="vd-nav-logout" data-vd-logout><span class="ic">🚪</span> Log Out</a>
+    </nav>
+  </aside>
+
+  <div class="vd-main">
+    <div class="vd-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="vd-mobile-nav-toggle" aria-label="Menu">☰</button>
+        <div><h1>Hero Images</h1><div class="vd-topbar-sub">Manage the banner photo at the top of each page.</div></div>
+      </div>
+      <div class="vd-topbar-right"><div class="vd-admin-chip"><span class="avatar" id="vd-admin-initial">A</span><span id="vd-admin-name">…</span></div></div>
+    </div>
+
+    <div class="vd-content">
+      <div class="vd-page-grid" id="page-grid"></div>
+
+      <div class="vd-editor" id="editor">
+        <div class="vd-card">
+          <div class="vd-card-hd">
+            <div>
+              <h2 id="editor-title">Editing…</h2>
+              <p id="editor-status-line">—</p>
+            </div>
+            <span class="vd-badge draft" id="editor-badge">Draft</span>
+          </div>
+
+          <div class="vd-editor-grid">
+            <div>
+              <div class="vd-field">
+                <label>Current / Preview Image</label>
+                <div class="vd-focal-wrap" id="focal-wrap" title="Click anywhere on the photo to set the focal point">
+                  <img id="preview-img" src="" alt="" style="display:none" />
+                  <div id="preview-empty" class="vd-page-card thumb-empty" style="height:260px;">No image selected yet</div>
+                  <div class="vd-focal-dot" id="focal-dot" style="display:none"></div>
+                </div>
+                <p class="hint">Click the photo to choose what should stay visible when the hero crops on smaller screens (the focal point).</p>
+              </div>
+
+              <div class="vd-field">
+                <label>Replace Image</label>
+                <label class="vd-upload-drop" for="file-input">
+                  📤 Click to choose a JPG, PNG, or WEBP (max 10 MB)
+                </label>
+                <input type="file" id="file-input" accept="image/jpeg,image/jpg,image/png,image/webp" style="display:none" />
+                <div class="vd-progress" id="upload-progress"><div class="vd-progress-bar" id="upload-progress-bar"></div></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="vd-field">
+                <label for="alt-text">Alt Text</label>
+                <input type="text" id="alt-text" placeholder="Describe the image for accessibility &amp; SEO" />
+              </div>
+
+              <div class="vd-field">
+                <label>Text Alignment</label>
+                <div class="vd-align-row">
+                  <button type="button" data-align="left">Left</button>
+                  <button type="button" data-align="center">Center</button>
+                  <button type="button" data-align="right">Right</button>
+                </div>
+                <p class="hint">Matches the existing hero layout — doesn't change spacing or fonts.</p>
+              </div>
+
+              <div class="vd-field">
+                <label>Focal Point</label>
+                <div style="font-size:12.5px;color:var(--ink-2)">X: <span id="focal-x-val">50</span>% &nbsp; Y: <span id="focal-y-val">50</span>%</div>
+              </div>
+
+              <div class="vd-meta-row" id="editor-meta"></div>
+
+              <div class="vd-btn-row" style="margin-top:20px;">
+                <button class="btn btn-outline btn-sm" id="btn-cancel">Cancel</button>
+                <button class="btn btn-outline btn-sm" id="btn-remove">Remove Image</button>
+                <button class="btn btn-outline btn-sm" id="btn-draft">Save as Draft</button>
+                <button class="btn btn-primary btn-sm" id="btn-publish">Publish</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/upload.js"></script>
+<script src="js/activity-log.js"></script>
+<script>
+  const PAGES = [
+    { slug: 'home', name: 'Homepage' },
+    { slug: 'shop', name: 'Shop' },
+    { slug: 'collections', name: 'Collections' },
+    { slug: 'new-arrivals', name: 'New Arrivals' },
+    { slug: 'about', name: 'About Us' },
+    { slug: 'contact', name: 'Contact' },
+  ];
+
+  let currentSlug = null;
+  let currentDraftRow = null;   // the draft row for the selected page, if any
+  let currentPublishedRow = null;
+  let workingState = null;      // { media_asset_id, publicUrl, alt_text, focal_x, focal_y, alignment }
+  let publishedThumbs = {};     // slug -> public_url, for the page grid
+
+  async function loadPageGrid() {
+    const grid = document.getElementById('page-grid');
+    grid.innerHTML = PAGES.map((p) => `
+      <div class="vd-page-card" data-slug="${p.slug}">
+        <div class="thumb-empty" id="thumb-${p.slug}">Loading…</div>
+        <div class="body">
+          <div class="name">${p.name}</div>
+          <span class="vd-badge" id="badge-${p.slug}">—</span>
+        </div>
+      </div>`).join('');
+
+    grid.querySelectorAll('.vd-page-card').forEach((card) => {
+      card.addEventListener('click', () => selectPage(card.getAttribute('data-slug')));
+    });
+
+    const { data: rows } = await window.sb
+      .from('hero_images')
+      .select('*, media_assets(public_url)')
+      .in('status', ['published', 'draft']);
+
+    PAGES.forEach((p) => {
+      const pub = (rows || []).find((r) => r.page_slug === p.slug && r.status === 'published');
+      const draft = (rows || []).find((r) => r.page_slug === p.slug && r.status === 'draft');
+      const thumbEl = document.getElementById('thumb-' + p.slug);
+      const badgeEl = document.getElementById('badge-' + p.slug);
+      const url = pub?.media_assets?.public_url;
+      if (url) {
+        thumbEl.outerHTML = `<img class="thumb" id="thumb-${p.slug}" src="${url}" alt="" />`;
+      } else {
+        thumbEl.textContent = 'No image yet';
+      }
+      badgeEl.className = 'vd-badge ' + (draft ? 'draft' : pub ? 'published' : 'archived');
+      badgeEl.textContent = draft ? 'Unpublished changes' : pub ? 'Published' : 'Not set';
+    });
+  }
+
+  function selectPage(slug) {
+    currentSlug = slug;
+    document.querySelectorAll('.vd-page-card').forEach((c) => c.classList.toggle('active', c.getAttribute('data-slug') === slug));
+    loadEditor(slug);
+  }
+
+  async function loadEditor(slug) {
+    const pageInfo = PAGES.find((p) => p.slug === slug);
+    document.getElementById('editor-title').textContent = pageInfo.name + ' Hero';
+    document.getElementById('editor').classList.add('open');
+
+    const { data: rows } = await window.sb
+      .from('hero_images')
+      .select('*, media_assets(public_url), updated_admin:admin_users!hero_images_updated_by_fkey(full_name,email)')
+      .eq('page_slug', slug)
+      .in('status', ['draft', 'published'])
+      .order('created_at', { ascending: false });
+
+    currentPublishedRow = (rows || []).find((r) => r.status === 'published') || null;
+    currentDraftRow = (rows || []).find((r) => r.status === 'draft') || null;
+
+    const source = currentDraftRow || currentPublishedRow;
+    workingState = source
+      ? {
+          media_asset_id: source.media_asset_id,
+          publicUrl: source.media_assets?.public_url || null,
+          alt_text: source.alt_text || '',
+          focal_x: Number(source.focal_x ?? 0.5),
+          focal_y: Number(source.focal_y ?? 0.5),
+          alignment: source.alignment || 'left',
+        }
+      : { media_asset_id: null, publicUrl: null, alt_text: '', focal_x: 0.5, focal_y: 0.5, alignment: 'left' };
+
+    renderEditor();
+
+    const badge = document.getElementById('editor-badge');
+    if (currentDraftRow) { badge.className = 'vd-badge draft'; badge.textContent = 'Draft — not live yet'; }
+    else if (currentPublishedRow) { badge.className = 'vd-badge published'; badge.textContent = 'Published'; }
+    else { badge.className = 'vd-badge archived'; badge.textContent = 'Not set'; }
+
+    const pub = currentPublishedRow;
+    const statusLine = pub
+      ? `Last published ${new Date(pub.published_at || pub.updated_at).toLocaleString()}${pub.updated_admin ? ' by ' + (pub.updated_admin.full_name || pub.updated_admin.email) : ''}`
+      : 'Never published yet.';
+    document.getElementById('editor-status-line').textContent = statusLine;
+    document.getElementById('editor-meta').textContent = currentDraftRow
+      ? 'You have unpublished draft changes for this page.'
+      : '';
+
+    document.getElementById('editor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function renderEditor() {
+    const img = document.getElementById('preview-img');
+    const empty = document.getElementById('preview-empty');
+    const dot = document.getElementById('focal-dot');
+    if (workingState.publicUrl) {
+      img.src = workingState.publicUrl;
+      img.style.display = 'block';
+      empty.style.display = 'none';
+      dot.style.display = 'block';
+    } else {
+      img.style.display = 'none';
+      empty.style.display = 'flex';
+      dot.style.display = 'none';
+    }
+    dot.style.left = (workingState.focal_x * 100) + '%';
+    dot.style.top = (workingState.focal_y * 100) + '%';
+    document.getElementById('focal-x-val').textContent = Math.round(workingState.focal_x * 100);
+    document.getElementById('focal-y-val').textContent = Math.round(workingState.focal_y * 100);
+    document.getElementById('alt-text').value = workingState.alt_text;
+    document.querySelectorAll('.vd-align-row button').forEach((b) => {
+      b.classList.toggle('active', b.getAttribute('data-align') === workingState.alignment);
+    });
+  }
+
+  document.getElementById('focal-wrap').addEventListener('click', (e) => {
+    if (!workingState.publicUrl) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    workingState.focal_x = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    workingState.focal_y = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
+    renderEditor();
+  });
+
+  document.querySelectorAll('.vd-align-row button').forEach((btn) => {
+    btn.addEventListener('click', () => { workingState.alignment = btn.getAttribute('data-align'); renderEditor(); });
+  });
+
+  document.getElementById('alt-text').addEventListener('input', (e) => { workingState.alt_text = e.target.value; });
+
+  document.getElementById('file-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const err = vdValidateImageFile(file);
+    if (err) { vdToast(err, 'error'); e.target.value = ''; return; }
+
+    const progressWrap = document.getElementById('upload-progress');
+    const progressBar = document.getElementById('upload-progress-bar');
+    progressWrap.style.display = 'block';
+    e.target.disabled = true;
+
+    const { data: asset, error } = await vdUploadImage('hero-images', currentSlug, file, 'hero', (pct) => { progressBar.style.width = pct + '%'; });
+
+    e.target.disabled = false;
+    e.target.value = '';
+    setTimeout(() => { progressWrap.style.display = 'none'; progressBar.style.width = '0%'; }, 500);
+
+    if (error) { vdToast(error, 'error'); return; }
+
+    workingState.media_asset_id = asset.id;
+    workingState.publicUrl = asset.public_url;
+    renderEditor();
+    await vdLogActivity('hero_image.upload', 'media_asset', asset.id, { page_slug: currentSlug });
+    vdToast('Image uploaded successfully. Review it, then Save as Draft or Publish.', 'success');
+  });
+
+  document.getElementById('btn-cancel').addEventListener('click', () => loadEditor(currentSlug));
+
+  document.getElementById('btn-remove').addEventListener('click', async () => {
+    const ok = await vdConfirm({ title: 'Remove this hero image?', body: 'The photo will be removed from this page. It will stay in your Media Library and can be reused later.', confirmLabel: 'Remove' });
+    if (!ok) return;
+    workingState.media_asset_id = null;
+    workingState.publicUrl = null;
+    renderEditor();
+  });
+
+  async function saveRow(status) {
+    if (!currentSlug) return;
+    const payload = {
+      page_slug: currentSlug,
+      media_asset_id: workingState.media_asset_id,
+      alt_text: workingState.alt_text,
+      focal_x: workingState.focal_x,
+      focal_y: workingState.focal_y,
+      alignment: workingState.alignment,
+      status,
+      updated_by: window.vdCurrentAdmin.id,
+    };
+    if (status === 'published') payload.published_at = new Date().toISOString();
+
+    if (status === 'draft') {
+      if (currentDraftRow) {
+        return window.sb.from('hero_images').update(payload).eq('id', currentDraftRow.id).select().single();
+      }
+      payload.created_by = window.vdCurrentAdmin.id;
+      return window.sb.from('hero_images').insert(payload).select().single();
+    }
+
+    // Publishing: archive the old published row (if any), then either
+    // promote the current draft row or insert a fresh published row.
+    if (currentPublishedRow && (!currentDraftRow || currentPublishedRow.id !== currentDraftRow.id)) {
+      await window.sb.from('hero_images').update({ status: 'archived' }).eq('id', currentPublishedRow.id);
+    }
+    if (currentDraftRow) {
+      return window.sb.from('hero_images').update(payload).eq('id', currentDraftRow.id).select().single();
+    }
+    payload.created_by = window.vdCurrentAdmin.id;
+    return window.sb.from('hero_images').insert(payload).select().single();
+  }
+
+  document.getElementById('btn-draft').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true; btn.textContent = 'Saving…';
+    const { error } = await saveRow('draft');
+    btn.disabled = false; btn.textContent = 'Save as Draft';
+    if (error) { vdToast('Could not save draft: ' + error.message, 'error'); return; }
+    vdToast('Changes saved as a draft.', 'success');
+    await vdLogActivity('hero_image.draft', 'hero_image', null, { page_slug: currentSlug });
+    loadPageGrid();
+    loadEditor(currentSlug);
+  });
+
+  document.getElementById('btn-publish').addEventListener('click', async (e) => {
+    if (!workingState.media_asset_id) { vdToast('Choose an image before publishing.', 'error'); return; }
+    const btn = e.currentTarget;
+    btn.disabled = true; btn.textContent = 'Publishing…';
+    const { error } = await saveRow('published');
+    btn.disabled = false; btn.textContent = 'Publish';
+    if (error) { vdToast('Could not publish: ' + error.message, 'error'); return; }
+    vdToast('Changes published successfully. The live site now shows the new hero image.', 'success');
+    await vdLogActivity('hero_image.publish', 'hero_image', null, { page_slug: currentSlug });
+    loadPageGrid();
+    loadEditor(currentSlug);
+  });
+
+  (async function init() {
+    const admin = await vdRequireAdmin();
+    if (!admin) return;
+    document.getElementById('vd-admin-initial').textContent = (admin.full_name || admin.email).charAt(0).toUpperCase();
+    await loadPageGrid();
+    selectPage('home');
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Dashboard — Val & Dan Admin</title>
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body class="vd-admin">
+
+<div id="vd-config-warning" class="vd-config-warning">
+  ⚠️ Supabase isn't connected yet — edit <code>admin/js/config.js</code>. See README-ADMIN.md for setup steps.
+</div>
+
+<div class="vd-shell">
+  <aside class="vd-sidebar" id="vd-sidebar">
+    <div class="vd-sidebar-logo">
+      <img src="../logo.jpg" alt="Val & Dan Kids Boutique" />
+      <div><span>Val &amp; Dan</span><small>Admin</small></div>
+    </div>
+    <nav class="vd-nav">
+      <a href="dashboard.html" class="active"><span class="ic">🏠</span> Dashboard</a>
+      <a href="hero-images.html"><span class="ic">🖼️</span> Hero Images</a>
+      <a href="products.html"><span class="ic">👕</span> Products</a>
+      <a href="orders.html"><span class="ic">📦</span> Orders</a>
+      <a href="collections.html"><span class="ic">🎀</span> Collections</a>
+      <a href="new-arrivals.html"><span class="ic">✨</span> New Arrivals</a>
+      <a href="media-library.html"><span class="ic">🗂️</span> Media Library</a>
+      <a href="content.html"><span class="ic">📝</span> Website Content</a>
+      <a href="messages.html"><span class="ic">✉️</span> Messages</a>
+      <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
+      <a href="#" class="vd-nav-logout" data-vd-logout><span class="ic">🚪</span> Log Out</a>
+    </nav>
+  </aside>
+
+  <div class="vd-main">
+    <div class="vd-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="vd-mobile-nav-toggle" aria-label="Menu">☰</button>
+        <h1>Dashboard Overview</h1>
+      </div>
+      <div class="vd-topbar-right">
+        <div class="vd-topbar-search"><span class="ic">🔍</span><input type="text" placeholder="Search media or content…" aria-label="Search media or content" /></div>
+        <button class="vd-bell-btn" aria-label="Notifications">🔔</button>
+        <a href="../index.html" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Visit Store ♡ ↗</a>
+        <div class="vd-admin-chip"><span class="avatar" id="vd-admin-initial">A</span><span id="vd-admin-name">…</span></div>
+      </div>
+    </div>
+
+    <div class="vd-content">
+      <div class="vd-welcome-banner">
+        <h2>Welcome back! ♡</h2>
+        <p>Your brand is growing beautifully. Here's a look at your current website health, content updates, and recent store activities.</p>
+      </div>
+
+      <div class="vd-stat-grid">
+        <div class="vd-stat-card">
+          <div class="vd-stat-card-hd"><div class="lbl">Total Products Active</div><div class="ic-wrap">📦</div></div>
+          <div class="num" id="stat-products">–</div>
+          <div class="sub" id="stat-products-sub">Published products</div>
+        </div>
+        <div class="vd-stat-card">
+          <div class="vd-stat-card-hd"><div class="lbl">Pending Orders</div><div class="ic-wrap">🛒</div></div>
+          <div class="num" id="stat-orders">–</div>
+          <div class="sub" id="stat-orders-sub">Awaiting processing</div>
+        </div>
+        <div class="vd-stat-card">
+          <div class="vd-stat-card-hd"><div class="lbl">Photos &amp; Media</div><div class="ic-wrap">🖼️</div></div>
+          <div class="num" id="stat-arrivals">–</div>
+          <div class="sub" id="stat-arrivals-sub">New arrivals live</div>
+        </div>
+        <div class="vd-stat-card">
+          <div class="vd-stat-card-hd"><div class="lbl">Unread Messages</div><div class="ic-wrap">✉️</div></div>
+          <div class="num" id="stat-messages">–</div>
+          <div class="sub" id="stat-messages-sub">Needs a reply</div>
+        </div>
+      </div>
+
+      <div class="vd-dashboard-split">
+        <div class="vd-card">
+          <div class="vd-card-hd">
+            <div><h2>Recent CMS Activity</h2></div>
+          </div>
+          <div id="activity-list" class="vd-activity-list">
+            Loading…
+          </div>
+        </div>
+
+        <div class="vd-card">
+          <div class="vd-card-hd">
+            <div><h2>Quick Actions</h2></div>
+          </div>
+          <div class="vd-quick-actions">
+            <a href="products.html" class="vd-quick-action"><span class="ic-wrap">➕</span><span><span class="ttl">Add New Product</span><span class="desc">Create, edit, set prices &amp; inventory</span></span></a>
+            <a href="media-library.html" class="vd-quick-action"><span class="ic-wrap">⬆️</span><span><span class="ttl">Upload New Media</span><span class="desc">Manage product photography</span></span></a>
+            <a href="hero-images.html" class="vd-quick-action"><span class="ic-wrap">✏️</span><span><span class="ttl">Edit Homepage</span><span class="desc">Update hero &amp; featured items</span></span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/activity-log.js"></script>
+<script>
+  (async function init() {
+    const admin = await vdRequireAdmin();
+    if (!admin) return;
+    document.getElementById('vd-admin-initial').textContent = (admin.full_name || admin.email).charAt(0).toUpperCase();
+
+    const [{ count: prodCount }, { count: collCount }, { count: arrivalCount }, { count: msgCount }, { count: orderCount }] = await Promise.all([
+      window.sb.from('products').select('id', { count: 'exact', head: true }).eq('status', 'published'),
+      window.sb.from('collections').select('id', { count: 'exact', head: true }).eq('status', 'published'),
+      window.sb.from('products').select('id', { count: 'exact', head: true }).eq('status', 'published').eq('is_new_arrival', true),
+      window.sb.from('contact_messages').select('id', { count: 'exact', head: true }).eq('status', 'unread'),
+      window.sb.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'received'),
+    ]);
+    document.getElementById('stat-products').textContent = prodCount ?? 0;
+    document.getElementById('stat-arrivals').textContent = arrivalCount ?? 0;
+    document.getElementById('stat-messages').textContent = msgCount ?? 0;
+    document.getElementById('stat-orders').textContent = orderCount ?? 0;
+    document.getElementById('stat-orders-sub').textContent = orderCount === 1 ? '1 awaiting processing' : `${orderCount ?? 0} awaiting processing`;
+    document.getElementById('stat-messages-sub').textContent = msgCount ? `${msgCount} need a reply` : 'All caught up';
+    document.getElementById('stat-arrivals-sub').textContent = `${collCount ?? 0} published collections`;
+
+    const { data: logs } = await window.sb
+      .from('activity_logs')
+      .select('*, admin_users(full_name, email)')
+      .order('created_at', { ascending: false })
+      .limit(6);
+    const list = document.getElementById('activity-list');
+    if (!logs || !logs.length) {
+      list.innerHTML = '<div class="vd-activity-empty">No activity recorded yet.</div>';
+    } else {
+      list.innerHTML = logs.map((row) => `<div class="vd-activity-item"><span class="ic-wrap">🔄</span><span>${vdFormatActivity(row)}</span></div>`).join('');
+    }
+  })();
+</script>
+</body>
+</html>

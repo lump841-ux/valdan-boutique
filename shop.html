@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shop All Clothing &amp; Layers — Val &amp; Dan Kids Boutique</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- PROMO BAR -->
+<div class="promo-bar">
+  <div class="container">
+    <p>✨ Free shipping on all orders over $60 • Use code: <strong>LITTLEFERNS</strong> ✨</p>
+  </div>
+</div>
+
+<!-- PAGE NAV: plain bar (not overlaid on a photo) — matches the Figma
+     "[Shop] val-dan-shop-page" frame's navigation section exactly. -->
+<div class="fig-page-nav-wrap">
+  <nav class="fig-nav">
+    <div class="fig-nav-left">
+      <a href="index.html">Home</a>
+      <a href="shop.html" class="active">Shop</a>
+      <a href="collections.html">Collections</a>
+      <a href="about.html">Our Story</a>
+    </div>
+    <a href="index.html" class="fig-nav-logo">
+      <img src="logo-transparent.png" alt="Val &amp; Dan Kids Boutique" />
+    </a>
+    <div class="fig-nav-right">
+      <a href="shop.html" aria-label="Search">🔍</a>
+      <a href="account.html" aria-label="Account">👤</a>
+      <a href="cart.html" aria-label="Cart" class="fig-nav-cart">
+        🛍️<span class="fig-cart-badge" id="cart-count">0</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</div>
+
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="collections.html">Collections</a>
+  <a href="about.html">Our Story</a>
+</div>
+
+<!-- SHOP CONTENT: breadcrumbs → intro box → sidebar/grid split layout —
+     matches the Figma "shop-content-container" exactly. -->
+<div class="fig-shop-content">
+  <div class="container">
+    <nav class="fig-breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a>
+      <span>/</span>
+      <a href="shop.html">Shop</a>
+      <span>/</span>
+      <span class="current" id="breadcrumb-current">All Clothing</span>
+    </nav>
+
+    <div class="fig-shop-intro">
+      <h1 id="shop-intro-title">All Clothing &amp; Layers</h1>
+      <p>Explore our collection of soft, sustainably made organic garments for babies and toddlers. Designed to let little ones move, play, and dream freely.</p>
+    </div>
+
+    <div class="fig-shop-layout">
+      <aside class="fig-shop-sidebar">
+        <div class="fig-filter-group">
+          <h4>Categories</h4>
+          <div class="fig-cat-options" id="fig-cat-options">
+            <button type="button" class="fig-cat-option active" data-cat="All">
+              <span class="fig-cat-dot"></span>All Clothing &amp; Layers
+            </button>
+            <button type="button" class="fig-cat-option" data-cat="Rompers">
+              <span class="fig-cat-dot"></span>Rompers &amp; Onesies
+            </button>
+            <button type="button" class="fig-cat-option" data-cat="Sets">
+              <span class="fig-cat-dot"></span>Sets
+            </button>
+            <button type="button" class="fig-cat-option" data-cat="Knitwear">
+              <span class="fig-cat-dot"></span>Knitwear
+            </button>
+            <button type="button" class="fig-cat-option" data-cat="Dresses">
+              <span class="fig-cat-dot"></span>Dresses
+            </button>
+            <button type="button" class="fig-cat-option" data-cat="Accessories">
+              <span class="fig-cat-dot"></span>Accessories
+            </button>
+          </div>
+        </div>
+
+        <div class="fig-filter-group">
+          <h4>Sizes</h4>
+          <div class="fig-size-pills" id="fig-size-pills">
+            <button type="button" class="fig-size-pill" data-size="NB">Newborn</button>
+            <button type="button" class="fig-size-pill" data-size="0-3M">0-3 Months</button>
+            <button type="button" class="fig-size-pill active" data-size="3-6M">3-6 Months</button>
+            <button type="button" class="fig-size-pill" data-size="6-12M">6-12 Months</button>
+            <button type="button" class="fig-size-pill" data-size="12-18M">12-18 Months</button>
+            <button type="button" class="fig-size-pill" data-size="2T">2T</button>
+            <button type="button" class="fig-size-pill" data-size="3T">3T</button>
+          </div>
+        </div>
+
+        <div class="fig-filter-group">
+          <h4>Color Palette</h4>
+          <div class="fig-color-row">
+            <span class="fig-color-dot" style="background:var(--pink-lt)"></span>
+            <span class="fig-color-dot" style="background:var(--blue-lt)"></span>
+            <span class="fig-color-dot" style="background:var(--green-lt)"></span>
+            <span class="fig-color-dot" style="background:var(--purple-lt)"></span>
+            <span class="fig-color-dot" style="background:var(--tan-lt)"></span>
+          </div>
+        </div>
+
+        <button type="button" class="fig-reset-filters" id="fig-reset-filters">Reset All Filters</button>
+      </aside>
+
+      <div class="fig-shop-grid-area">
+        <div class="fig-shop-toolbar">
+          <span class="fig-shop-count" id="fig-shop-count">Showing 1–6 of 24 adorable items</span>
+          <div class="fig-sort-wrap">
+            <span>Sort by:</span>
+            <select class="fig-sort-select" id="fig-sort-select">
+              <option value="featured">New Arrivals ♡</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="name">Name: A–Z</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="fig-shop-grid" id="fig-shop-grid"></div>
+        <div class="empty" id="fig-shop-empty" style="display:none">
+          <div class="icon">🔍</div>
+          <h3>No products match your filters</h3>
+          <p>Try a different category or clear the filter.</p>
+        </div>
+
+        <div class="fig-shop-pagination">
+          <span class="fig-page-num active">1</span>
+          <span class="fig-page-num">2</span>
+          <span class="fig-page-num">3</span>
+          <span class="fig-page-num fig-page-next">Next →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="fig-footer">
+  <div class="container">
+    <div class="fig-footer-cols">
+      <div class="fig-footer-brand">
+        <h3>Val &amp; Dan's Kids Boutique</h3>
+        <p>Crafting premium organic children's wear that honors soft skin and sweet moments. Beautiful styles created sustainably.</p>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All Clothing</a></li>
+          <li><a href="shop.html?category=Boys">Baby Rompers</a></li>
+          <li><a href="shop.html?category=Gift+Sets">Gift Sets</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Help</h4>
+        <ul>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">Shipping &amp; Returns</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col fig-footer-subscribe">
+        <h4>Subscribe</h4>
+        <p>Join our newsletter for sweet deals &amp; storybook updates.</p>
+        <form onsubmit="event.preventDefault(); showToast('Welcome to the family! Check your inbox 💗'); this.reset();">
+          <input type="email" placeholder="Your email address" required />
+          <button type="submit" class="fig-footer-subscribe-btn" aria-label="Subscribe">→</button>
+        </form>
+      </div>
+    </div>
+    <div class="fig-footer-rule"></div>
+    <div class="fig-footer-bottom">
+      <span>© 2025 Val &amp; Dan Kids Boutique. All rights reserved.</span>
+      <span>Privacy Policy • Terms of Service</span>
+    </div>
+  </div>
+</footer>
+
+<!-- QUICK VIEW MODAL -->
+<div class="qv-modal-overlay" id="qv-overlay">
+  <div class="qv-modal">
+    <button class="qv-close" id="qv-close">✕</button>
+    <img id="qv-img" src="" alt="" />
+    <div class="qv-modal-info">
+      <div class="cat" id="qv-cat"></div>
+      <h3 id="qv-name"></h3>
+      <div class="price" id="qv-price"></div>
+      <p id="qv-desc"></p>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" id="qv-add" style="flex:1">Add to Cart</button>
+        <a class="btn btn-outline" id="qv-view-full" href="#" style="flex:1;text-align:center">View Full Details</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="site-data.js"></script>
+<script src="shop.js"></script>
+<script>
+  vdApplySiteContent();
+
+(function () {
+  // Figma's sidebar categories don't match the site's real Girls/Boys/
+  // Accessories taxonomy 1:1, so real products are bucketed into the
+  // Figma-labeled categories by keyword — this keeps the exact Figma
+  // copy/structure while still filtering the real, working catalog.
+  const CATEGORY_MATCHERS = {
+    All: () => true,
+    Rompers: (p) => /romper|onesie|bodysuit/i.test(p.name),
+    Sets: (p) => /\bset\b/i.test(p.name),
+    Knitwear: (p) => /knit|cardigan|sweater/i.test(p.name),
+    Dresses: (p) => /dress|gown/i.test(p.name),
+    Accessories: (p) => p.category === 'Accessories',
+  };
+  const CATEGORY_LABELS = {
+    All: 'All Clothing',
+    Rompers: 'Rompers & Onesies',
+    Sets: 'Sets',
+    Knitwear: 'Knitwear',
+    Dresses: 'Dresses',
+    Accessories: 'Accessories',
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  let activeCategory = 'All';
+  const initialCategory = params.get('category');
+  if (initialCategory === 'Accessories') activeCategory = 'Accessories';
+
+  let activeSize = '3-6M'; // Figma shows the "3-6 Months" pill pre-selected
+
+  function matches(p) {
+    const catOk = CATEGORY_MATCHERS[activeCategory] ? CATEGORY_MATCHERS[activeCategory](p) : true;
+    const sizeOk = !activeSize || (p.sizes || []).includes(activeSize);
+    return catOk && sizeOk;
+  }
+
+  function render() {
+    const sort = document.getElementById('fig-sort-select').value;
+    let list = ALL_PRODUCTS.filter(matches);
+
+    if (sort === 'price-asc') list = [...list].sort((a, b) => a.price - b.price);
+    else if (sort === 'price-desc') list = [...list].sort((a, b) => b.price - a.price);
+    else if (sort === 'name') list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+
+    const total = list.length;
+    document.getElementById('fig-shop-count').textContent =
+      total === 0 ? 'No adorable items found' : `Showing 1–${Math.min(total, 6)} of ${total} adorable item${total === 1 ? '' : 's'}`;
+    document.getElementById('shop-intro-title').textContent = CATEGORY_LABELS[activeCategory] === 'All Clothing' ? 'All Clothing & Layers' : CATEGORY_LABELS[activeCategory];
+    document.getElementById('breadcrumb-current').textContent = CATEGORY_LABELS[activeCategory];
+
+    const grid = document.getElementById('fig-shop-grid');
+    const empty = document.getElementById('fig-shop-empty');
+    if (total === 0) {
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      grid.innerHTML = list.map((p) => productCardHTML(p)).join('');
+      wireWishButtons(grid);
+    }
+  }
+
+  document.querySelectorAll('.fig-cat-option').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      activeCategory = btn.getAttribute('data-cat');
+      document.querySelectorAll('.fig-cat-option').forEach((b) => b.classList.toggle('active', b === btn));
+      render();
+    });
+  });
+
+  document.querySelectorAll('.fig-size-pill').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const size = btn.getAttribute('data-size');
+      const turningOn = !btn.classList.contains('active');
+      document.querySelectorAll('.fig-size-pill').forEach((b) => b.classList.remove('active'));
+      activeSize = turningOn ? size : null;
+      if (turningOn) btn.classList.add('active');
+      render();
+    });
+  });
+
+  document.getElementById('fig-sort-select').addEventListener('change', render);
+
+  document.getElementById('fig-reset-filters').addEventListener('click', () => {
+    activeCategory = 'All';
+    activeSize = null;
+    document.getElementById('fig-sort-select').value = 'featured';
+    document.querySelectorAll('.fig-cat-option').forEach((b) => b.classList.toggle('active', b.getAttribute('data-cat') === 'All'));
+    document.querySelectorAll('.fig-size-pill').forEach((b) => b.classList.remove('active'));
+    render();
+  });
+
+  window.vdRerenderCatalog = render;
+  render();
+})();
+</script>
+</body>
+</html>

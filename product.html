@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Product — Val & Dan Kids Boutique</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- PROMO BAR -->
+<div class="promo-bar">
+  <div class="container">
+    <p>✨ Free shipping on all orders over $60 • Use code: <strong>LITTLEFERNS</strong> ✨</p>
+  </div>
+</div>
+
+<!-- PAGE NAV: plain bar, matches the Figma "[Shop] val-dan-product-detail" frame -->
+<div class="fig-page-nav-wrap">
+  <nav class="fig-nav">
+    <div class="fig-nav-left">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="collections.html">Collections</a>
+      <a href="about.html">Our Story</a>
+    </div>
+    <a href="index.html" class="fig-nav-logo">
+      <img src="logo-transparent.png" alt="Val &amp; Dan Kids Boutique" />
+    </a>
+    <div class="fig-nav-right">
+      <a href="shop.html" aria-label="Search">🔍</a>
+      <a href="account.html" aria-label="Account">👤</a>
+      <a href="cart.html" aria-label="Cart" class="fig-nav-cart">
+        🛍️<span class="fig-cart-badge" id="cart-count">0</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</div>
+
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="collections.html">Collections</a>
+  <a href="about.html">Our Story</a>
+</div>
+
+<div class="fig-pdp-content">
+  <div class="container" id="pdp-root">
+    <!-- Populated by JS -->
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="fig-footer">
+  <div class="container">
+    <div class="fig-footer-cols">
+      <div class="fig-footer-brand">
+        <h3>Val &amp; Dan's Kids Boutique</h3>
+        <p>Crafting premium organic children's wear that honors soft skin and sweet moments. Beautiful styles created sustainably.</p>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All Clothing</a></li>
+          <li><a href="shop.html?category=Boys">Baby Rompers</a></li>
+          <li><a href="shop.html?category=Gift+Sets">Gift Sets</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Help</h4>
+        <ul>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">Shipping &amp; Returns</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col fig-footer-subscribe">
+        <h4>Subscribe</h4>
+        <p>Join our newsletter for sweet deals &amp; storybook updates.</p>
+        <form onsubmit="event.preventDefault(); showToast('Welcome to the family! Check your inbox 💗'); this.reset();">
+          <input type="email" placeholder="Your email address" required />
+          <button type="submit" class="fig-footer-subscribe-btn" aria-label="Subscribe">→</button>
+        </form>
+      </div>
+    </div>
+    <div class="fig-footer-rule"></div>
+    <div class="fig-footer-bottom">
+      <span>© 2025 Val &amp; Dan Kids Boutique. All rights reserved.</span>
+      <span>Privacy Policy • Terms of Service</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="site-data.js"></script>
+<script src="shop.js"></script>
+<script>
+window.vdRerenderCatalog = renderProductPage;
+renderProductPage();
+
+const PDP_COLOR_SWATCHES = { 'Petal Pink': '#F3DCE4', 'Sky Blue': '#CFE3F0', 'Sage': '#D8E4D2', 'Lavender': '#E3D6EE', 'Cream': '#FAF6F0' };
+
+function renderProductPage() {
+  const params = new URLSearchParams(window.location.search);
+  const product = getProductById(params.get('id'));
+  const root = document.getElementById('pdp-root');
+
+  if (!product) {
+    root.innerHTML = `<div class="empty"><div class="icon">🎀</div><h3>Product not found</h3>
+      <p>It may have sold out or moved. <a href="shop.html" style="color:var(--pink)">Back to shop →</a></p></div>`;
+    return;
+  }
+
+  document.title = product.name + ' — Val & Dan Kids Boutique';
+
+  const gallery = (product.images && product.images.length ? product.images : [product.img, product.img2, product.img]).filter(Boolean);
+  while (gallery.length < 3) gallery.push(product.img);
+
+  const colorNames = product.colors && product.colors.length ? product.colors : ['Petal Pink', 'Sky Blue'];
+
+  root.innerHTML = `
+    <nav class="fig-breadcrumb" aria-label="Breadcrumb" style="margin-bottom:0">
+      <a href="index.html">Home</a>
+      <span>/</span>
+      <a href="shop.html">Shop</a>
+      <span>/</span>
+      <a href="shop.html?category=${encodeURIComponent(product.category)}">${product.category}</a>
+      <span>/</span>
+      <span class="current">${product.name}</span>
+    </nav>
+
+    <div class="fig-pdp-split">
+      <div class="fig-pdp-gallery">
+        <div class="fig-pdp-thumbs" id="pdp-thumbs">
+          ${gallery.slice(0, 3).map((src, i) => `<div class="fig-pdp-thumb ${i === 0 ? 'active' : ''}" data-src="${src}"><img src="${src}" alt="" /></div>`).join('')}
+        </div>
+        <div class="fig-pdp-main"><img id="pdp-main-img" src="${gallery[0]}" alt="${product.name}" /></div>
+      </div>
+
+      <div class="fig-pdp-info">
+        <div class="fig-pdp-basic">
+          ${product.badge ? `<span class="fig-pdp-eyebrow">${product.badge === 'New' ? 'New Arrival' : product.badge === 'Sale' ? 'On Sale' : product.badge}</span>` : `<span class="fig-pdp-eyebrow">Best Seller</span>`}
+          <h1 class="fig-pdp-title">${product.name}</h1>
+          <div class="fig-pdp-stars">
+            <span class="stars">★★★★☆</span>
+            <span class="count">(24 happy parents)</span>
+          </div>
+          <div class="fig-pdp-price">${product.wasPrice ? `<span class="was">$${product.wasPrice.toFixed(2)}</span>` : ''}$${product.price.toFixed(2)}</div>
+        </div>
+
+        <p class="fig-pdp-desc">${product.desc}</p>
+
+        <div class="fig-pdp-divider"></div>
+
+        <div class="fig-pdp-color-group">
+          <p class="fig-pdp-color-label">Color: <span class="val" id="pdp-color-val">${colorNames[0]}</span></p>
+          <div class="fig-pdp-color-row" id="pdp-color-row">
+            ${colorNames.map((c, i) => `<span class="fig-pdp-color-swatch ${i === 0 ? 'active' : ''}" data-color="${c}" style="background:${PDP_COLOR_SWATCHES[c] || '#F3DCE4'}"></span>`).join('')}
+          </div>
+        </div>
+
+        <div class="fig-pdp-size-group">
+          <p class="fig-pdp-size-label">Select Size:</p>
+          <div class="fig-pdp-sizes" id="size-row">
+            ${product.sizes.map((s, i) => `<span class="fig-pdp-size-opt ${i === 0 ? 'active' : ''}" data-size="${s}">${s}</span>`).join('')}
+          </div>
+        </div>
+
+        <div class="fig-pdp-actions">
+          <div class="fig-pdp-qty" id="pdp-qty-control">
+            <button type="button" id="pdp-qty-minus" aria-label="Decrease quantity">−</button>
+            <span id="pdp-qty-value">1</span>
+            <button type="button" id="pdp-qty-plus" aria-label="Increase quantity">+</button>
+          </div>
+          <button class="fig-pdp-add-btn" id="add-cart-btn">Add to Cart ♡</button>
+          <button class="fig-pdp-wish-btn" id="wish-toggle-btn" aria-label="Add to wishlist">${isWishlisted(product.id) ? '♥' : '♡'}</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fig-pdp-related">
+      <h2>You May Also Love ♡</h2>
+      <div class="fig-related-grid" id="related-grid"></div>
+    </div>
+  `;
+
+  // Thumbnail swap
+  document.querySelectorAll('.fig-pdp-thumb').forEach(el => {
+    el.addEventListener('click', function () {
+      document.getElementById('pdp-main-img').src = this.getAttribute('data-src');
+      document.querySelectorAll('.fig-pdp-thumb').forEach(i => i.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Color select
+  document.querySelectorAll('.fig-pdp-color-swatch').forEach(sw => {
+    sw.addEventListener('click', function () {
+      document.querySelectorAll('.fig-pdp-color-swatch').forEach(s => s.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById('pdp-color-val').textContent = this.getAttribute('data-color');
+    });
+  });
+
+  // Size select
+  let selectedSize = product.sizes[0];
+  document.querySelectorAll('.fig-pdp-size-opt').forEach(opt => {
+    opt.addEventListener('click', function () {
+      document.querySelectorAll('.fig-pdp-size-opt').forEach(o => o.classList.remove('active'));
+      this.classList.add('active');
+      selectedSize = this.getAttribute('data-size');
+    });
+  });
+
+  // Quantity stepper
+  let qty = 1;
+  const qtyEl = document.getElementById('pdp-qty-value');
+  document.getElementById('pdp-qty-minus').addEventListener('click', function () {
+    qty = Math.max(1, qty - 1);
+    qtyEl.textContent = qty;
+  });
+  document.getElementById('pdp-qty-plus').addEventListener('click', function () {
+    qty = Math.min(10, qty + 1);
+    qtyEl.textContent = qty;
+  });
+
+  // Add to cart
+  document.getElementById('add-cart-btn').addEventListener('click', function () {
+    addToCart(product.id, selectedSize, qty);
+    showToast(`Added "${product.name}" to your cart 🛍️`);
+  });
+
+  // Wishlist toggle
+  const wishBtn = document.getElementById('wish-toggle-btn');
+  wishBtn.addEventListener('click', function () {
+    const active = toggleWishlist(product.id);
+    wishBtn.textContent = active ? '♥' : '♡';
+    showToast(active ? 'Added to wishlist 💗' : 'Removed from wishlist');
+  });
+
+  // Related products (same category, excluding self)
+  const related = ALL_PRODUCTS.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+  const relatedFallback = related.length ? related : ALL_PRODUCTS.filter(p => p.id !== product.id).slice(0, 4);
+  const relGrid = document.getElementById('related-grid');
+  relGrid.innerHTML = relatedFallback.map(p => productCardHTML(p)).join('');
+  wireWishButtons(relGrid);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Val & Dan Kids Boutique — Adorable Styles for Little Ones</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page-home">
+
+<!-- PROMO BAR -->
+<div class="promo-bar">
+  <div class="container">
+    <p>✨ Free Shipping on all orders over $60 • Use code: <strong>LITTLEFERNS</strong> ✨</p>
+  </div>
+</div>
+
+<!-- HERO: full-bleed photo banner with the nav floating on top of it, and
+     the hero copy left-aligned below the nav — matches the Figma frame's
+     "full-bleed-hero-wrapper" (promo bar → hero → nav-on-photo → copy). -->
+<section class="fig-hero">
+  <div class="fig-hero-media">
+    <img
+      src="hero.jpg"
+      alt="A little girl in a pink lace boutique dress and a little boy in a white shirt, bow tie and suspenders, smiling at each other beside a large teddy bear"
+      class="fig-hero-img home-hero-img"
+    />
+    <div class="fig-hero-scrim" aria-hidden="true"></div>
+  </div>
+
+  <div class="fig-hero-inner">
+    <nav class="fig-nav">
+      <div class="fig-nav-left">
+        <a href="index.html" class="active">Home</a>
+        <a href="shop.html">Shop</a>
+        <a href="collections.html">Collections</a>
+        <a href="about.html">Our Story</a>
+      </div>
+      <a href="index.html" class="fig-nav-logo">
+        <img src="logo.jpg" alt="Val &amp; Dan Kids Boutique" />
+      </a>
+      <div class="fig-nav-right">
+        <a href="shop.html" aria-label="Search">🔍</a>
+        <a href="account.html" aria-label="Account">👤</a>
+        <a href="cart.html" aria-label="Cart" class="fig-nav-cart">
+          🛍️<span class="fig-cart-badge" id="cart-count">0</span>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+    </nav>
+
+    <div class="fig-hero-content">
+      <span class="fig-hero-eyebrow">Dressed in nature's charm</span>
+      <h1 class="fig-hero-title">Dressed in<br />nature's charm <span class="heart">♡</span></h1>
+      <p class="fig-hero-sub" data-vd-content="home_hero_sub">Beautifully crafted organic clothing for little explorers. Soft, sustainable, and made to grow with them.</p>
+      <div class="fig-hero-actions">
+        <a href="collections.html" class="btn btn-primary" data-vd-content="btn_explore_collection">Explore Collection</a>
+        <a href="shop.html?sort=new" class="btn btn-outline">New Arrivals</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="collections.html">Collections</a>
+  <a href="about.html">Our Story</a>
+</div>
+
+<!-- EXPLORE OUR WORLD: category grid (5 cards, 2-up rows) -->
+<section class="fade-in-up fig-categories">
+  <div class="container">
+    <div class="fig-section-hd">
+      <span class="fig-eyebrow">explore our world</span>
+      <h2 class="fig-title">Explore Our World</h2>
+      <p class="fig-section-sub">Discover curated collections for little explorers - soft, sustainable, and made to grow with them.</p>
+    </div>
+    <div class="fig-cat-grid">
+      <a class="fig-cat-card" href="shop.html?category=Unisex">
+        <div class="fig-cat-photo"><img src="product-teddy-bear.jpg" alt="Little Ones" /></div>
+        <div class="fig-cat-info">
+          <h3>Little Ones</h3>
+          <span>Shop Now →</span>
+        </div>
+      </a>
+      <a class="fig-cat-card" href="shop.html?category=Boys">
+        <div class="fig-cat-photo"><img src="product-boy-outfit.jpg" alt="Adventurers" /></div>
+        <div class="fig-cat-info">
+          <h3>Adventurers</h3>
+          <span>Shop Now →</span>
+        </div>
+      </a>
+      <a class="fig-cat-card" href="shop.html">
+        <div class="fig-cat-photo"><img src="product-boy-bowtie.jpg" alt="Outdoor Layers" /></div>
+        <div class="fig-cat-info">
+          <h3>Outdoor Layers</h3>
+          <span>Shop Now →</span>
+        </div>
+      </a>
+      <a class="fig-cat-card" href="shop.html?category=Accessories">
+        <div class="fig-cat-photo"><img src="product-teddy-bow.jpg" alt="Accessories" /></div>
+        <div class="fig-cat-info">
+          <h3>Accessories</h3>
+          <span>Shop Now →</span>
+        </div>
+      </a>
+      <a class="fig-cat-card" href="shop.html?category=Gift+Sets">
+        <div class="fig-cat-photo"><img src="product-girl-bow.jpg" alt="Gift Bundles" /></div>
+        <div class="fig-cat-info">
+          <h3>Gift Bundles</h3>
+          <span>Shop Now →</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FRESH FINDS: 5-up product grid -->
+<section class="fade-in-up fig-arrivals">
+  <div class="container">
+    <div class="fig-arrivals-hd">
+      <div class="fig-arrivals-title-stack">
+        <span class="fig-eyebrow">fresh finds</span>
+        <h2 class="fig-title fig-title-left">Fresh Finds <span class="heart">♡</span></h2>
+      </div>
+      <a href="shop.html?sort=new" class="btn btn-outline">View All Arrivals</a>
+    </div>
+    <div class="product-grid fig-product-grid" id="fresh-finds-grid"></div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<section class="fade-in-up fig-trust-bar">
+  <div class="container">
+    <div class="fig-trust-grid">
+      <div class="fig-trust-item">
+        <div class="fig-trust-icon">🌱</div>
+        <div class="fig-trust-txt">
+          <div class="lbl">100% GOTS Organic</div>
+          <div class="sub">GOTS certified cotton</div>
+        </div>
+      </div>
+      <div class="fig-trust-item">
+        <div class="fig-trust-icon">🛡️</div>
+        <div class="fig-trust-txt">
+          <div class="lbl">Plastic-Free Packaging</div>
+          <div class="sub">Perfect for sensitive baby skin</div>
+        </div>
+      </div>
+      <div class="fig-trust-item">
+        <div class="fig-trust-icon">📦</div>
+        <div class="fig-trust-txt">
+          <div class="lbl">Carbon Neutral Shipping</div>
+          <div class="sub">On orders over $75</div>
+        </div>
+      </div>
+      <div class="fig-trust-item">
+        <div class="fig-trust-icon">♻️</div>
+        <div class="fig-trust-txt">
+          <div class="lbl">Ethically Made</div>
+          <div class="sub">Sustainably manufactured</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="fig-footer">
+  <div class="container">
+    <div class="fig-footer-cols">
+      <div class="fig-footer-brand">
+        <h3>Val &amp; Dan's Kids Boutique</h3>
+        <p>Clothing little ones in nature's gentlest fabrics. Thoughtfully designed, sustainably crafted, endlessly lovable.</p>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All Clothing</a></li>
+          <li><a href="shop.html">Outdoor Layers</a></li>
+          <li><a href="shop.html?category=Gift+Sets">Gift Bundles</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Help</h4>
+        <ul>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">Shipping &amp; Returns</a></li>
+          <li><a href="#">Care Guide</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col fig-footer-subscribe">
+        <h4>Subscribe</h4>
+        <p>Join our grove for woodland deals &amp; seasonal updates.</p>
+        <form onsubmit="event.preventDefault(); showToast('Welcome to the family! Check your inbox 💗'); this.reset();">
+          <input type="email" placeholder="Your email address" required />
+          <button type="submit" class="fig-footer-subscribe-btn" aria-label="Subscribe">→</button>
+        </form>
+      </div>
+    </div>
+    <div class="fig-footer-rule"></div>
+    <div class="fig-footer-bottom">
+      <span>© 2026 Val &amp; Dan Kids Boutique. All rights reserved.</span>
+      <span>Privacy Policy • Terms of Service</span>
+    </div>
+  </div>
+</footer>
+
+<!-- QUICK VIEW MODAL -->
+<div class="qv-modal-overlay" id="qv-overlay">
+  <div class="qv-modal">
+    <button class="qv-close" id="qv-close">✕</button>
+    <img id="qv-img" src="" alt="" />
+    <div class="qv-modal-info">
+      <div class="cat" id="qv-cat"></div>
+      <h3 id="qv-name"></h3>
+      <div class="price" id="qv-price"></div>
+      <p id="qv-desc"></p>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" id="qv-add" style="flex:1">Add to Cart</button>
+        <a class="btn btn-outline" id="qv-view-full" href="#" style="flex:1;text-align:center">View Full Details</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="site-data.js"></script>
+<script src="shop.js"></script>
+<script>
+  vdApplyHeroImage('home', document.querySelector('.home-hero-img'));
+  vdApplySiteContent();
+
+  function renderHomeGrids() {
+    // "Fresh Finds" — a curated 5-up row matching the Figma home frame.
+    // Real catalog products/ids are used underneath (so wishlist, Quick
+    // View and Add-to-Cart all still work against real data) but the
+    // displayed name/price/photo are overridden to match the exact
+    // Figma copy for this section.
+    const byId = (id) => ALL_PRODUCTS.find((p) => p.id === id);
+    const freshFindsSpec = [
+      { id: 'flutter-sleeve-romper', name: 'Meadow Romper', price: 38.00, img: 'product-girl-dress.jpg' },
+      { id: 'little-explorer-set', name: 'Forest Floor Dungarees', price: 45.00, img: 'product-forest-dungarees.jpg' },
+      { id: 'lavender-dreams-dress', name: 'Willow Knit Dress', price: 42.00, img: 'product-willow-knit-dress.jpg' },
+      { id: 'classic-knit-cardigan', name: 'Mossy Cardigan', price: 36.00, img: 'product-mossy-cardigan.jpg' },
+      { id: 'meadow-bloom-set', name: 'Petal Tulle Skirt', price: 39.00, img: 'product-petal-tulle-skirt.jpg' },
+    ];
+    const freshFinds = freshFindsSpec
+      .map((spec) => {
+        const base = byId(spec.id);
+        if (!base) return null;
+        return { ...base, name: spec.name, price: spec.price, wasPrice: null, img: spec.img, badge: null };
+      })
+      .filter(Boolean);
+    const freshFindsFinal = freshFinds.length ? freshFinds : ALL_PRODUCTS.slice(0, 5);
+
+    document.getElementById('fresh-finds-grid').innerHTML = freshFindsFinal.map((p) => productCardHTML(p)).join('');
+    wireWishButtons();
+  }
+  window.vdRerenderCatalog = renderHomeGrids;
+  renderHomeGrids();
+</script>
+</body>
+</html>

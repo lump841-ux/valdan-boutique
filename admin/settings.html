@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Settings — Val & Dan Admin</title>
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body class="vd-admin">
+<div id="vd-config-warning" class="vd-config-warning">⚠️ Supabase isn't connected yet — edit <code>admin/js/config.js</code>. See README-ADMIN.md.</div>
+
+<div class="vd-shell">
+  <aside class="vd-sidebar" id="vd-sidebar">
+    <div class="vd-sidebar-logo"><img src="../logo.jpg" alt="Val & Dan Kids Boutique" /><div><span>Val &amp; Dan</span><small>Admin</small></div></div>
+    <nav class="vd-nav">
+      <a href="dashboard.html"><span class="ic">🏠</span> Dashboard</a>
+      <a href="hero-images.html"><span class="ic">🖼️</span> Hero Images</a>
+      <a href="products.html"><span class="ic">👕</span> Products</a>
+      <a href="orders.html"><span class="ic">📦</span> Orders</a>
+      <a href="collections.html"><span class="ic">🎀</span> Collections</a>
+      <a href="new-arrivals.html"><span class="ic">✨</span> New Arrivals</a>
+      <a href="media-library.html"><span class="ic">🗂️</span> Media Library</a>
+      <a href="content.html"><span class="ic">📝</span> Website Content</a>
+      <a href="messages.html"><span class="ic">✉️</span> Messages</a>
+      <a href="settings.html" class="active"><span class="ic">⚙️</span> Settings</a>
+      <a href="#" class="vd-nav-logout" data-vd-logout><span class="ic">🚪</span> Log Out</a>
+    </nav>
+  </aside>
+
+  <div class="vd-main">
+    <div class="vd-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="vd-mobile-nav-toggle" aria-label="Menu">☰</button>
+        <div><h1>Settings</h1><div class="vd-topbar-sub">Your profile, password, and a full activity history.</div></div>
+      </div>
+      <div class="vd-topbar-right"><div class="vd-admin-chip"><span class="avatar" id="vd-admin-initial">A</span><span id="vd-admin-name">…</span></div></div>
+    </div>
+
+    <div class="vd-content">
+      <div class="vd-card">
+        <div class="vd-card-hd"><div><h2>Your Profile</h2></div></div>
+        <div class="vd-field-row">
+          <div class="vd-field"><label>Full Name</label><input type="text" id="f-name" /></div>
+          <div class="vd-field"><label>Email</label><input type="text" id="f-email" disabled /></div>
+        </div>
+        <button class="btn btn-primary btn-sm" id="btn-save-profile">Save Profile</button>
+      </div>
+
+      <div class="vd-card">
+        <div class="vd-card-hd"><div><h2>Change Password</h2><p>Choose a password with at least 8 characters.</p></div></div>
+        <div class="vd-field-row">
+          <div class="vd-field">
+            <label>New Password</label>
+            <div class="vd-password-wrap"><input type="password" id="f-pw1" /><button type="button" id="toggle-pw1">Show</button></div>
+          </div>
+          <div class="vd-field">
+            <label>Confirm New Password</label>
+            <div class="vd-password-wrap"><input type="password" id="f-pw2" /><button type="button" id="toggle-pw2">Show</button></div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" id="btn-change-pw">Update Password</button>
+      </div>
+
+      <div class="vd-card">
+        <div class="vd-card-hd"><div><h2>Activity Log</h2><p>Every meaningful action taken across the dashboard, most recent first.</p></div></div>
+        <table class="vd-table">
+          <thead><tr><th>Admin</th><th>Action</th><th>Item</th><th>Date</th></tr></thead>
+          <tbody id="log-rows"><tr class="vd-empty-row"><td colspan="4">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/activity-log.js"></script>
+<script>
+  ['pw1', 'pw2'].forEach((n) => {
+    document.getElementById('toggle-' + n).addEventListener('click', function () {
+      const inp = document.getElementById('f-' + n);
+      const hidden = inp.type === 'password';
+      inp.type = hidden ? 'text' : 'password';
+      this.textContent = hidden ? 'Hide' : 'Show';
+    });
+  });
+
+  document.getElementById('btn-save-profile').addEventListener('click', async () => {
+    const name = document.getElementById('f-name').value.trim();
+    const { error } = await window.sb.from('admin_users').update({ full_name: name }).eq('id', window.vdCurrentAdmin.id);
+    if (error) { vdToast('Could not save: ' + error.message, 'error'); return; }
+    vdToast('Profile updated.', 'success');
+    document.getElementById('vd-admin-name').textContent = name;
+  });
+
+  document.getElementById('btn-change-pw').addEventListener('click', async () => {
+    const pw1 = document.getElementById('f-pw1').value;
+    const pw2 = document.getElementById('f-pw2').value;
+    if (pw1.length < 8) { vdToast('Password must be at least 8 characters.', 'error'); return; }
+    if (pw1 !== pw2) { vdToast('Passwords do not match.', 'error'); return; }
+    const btn = document.getElementById('btn-change-pw');
+    btn.disabled = true; btn.textContent = 'Updating…';
+    const { error } = await window.sb.auth.updateUser({ password: pw1 });
+    btn.disabled = false; btn.textContent = 'Update Password';
+    if (error) { vdToast('Could not update password: ' + error.message, 'error'); return; }
+    document.getElementById('f-pw1').value = '';
+    document.getElementById('f-pw2').value = '';
+    vdToast('Password updated successfully.', 'success');
+  });
+
+  async function loadLog() {
+    const { data, error } = await window.sb
+      .from('activity_logs')
+      .select('*, admin_users(full_name, email)')
+      .order('created_at', { ascending: false })
+      .limit(75);
+    const tbody = document.getElementById('log-rows');
+    if (error || !data || !data.length) { tbody.innerHTML = '<tr class="vd-empty-row"><td colspan="4">No activity recorded yet.</td></tr>'; return; }
+    tbody.innerHTML = data.map((r) => `
+      <tr>
+        <td>${r.admin_users?.full_name || r.admin_users?.email || 'Unknown'}</td>
+        <td>${r.action}</td>
+        <td>${r.entity_type ? r.entity_type + (r.details?.name ? ' — ' + r.details.name : '') : '—'}</td>
+        <td>${new Date(r.created_at).toLocaleString()}</td>
+      </tr>`).join('');
+  }
+
+  (async function init() {
+    const admin = await vdRequireAdmin();
+    if (!admin) return;
+    document.getElementById('vd-admin-initial').textContent = (admin.full_name || admin.email).charAt(0).toUpperCase();
+    document.getElementById('f-name').value = admin.full_name || '';
+    document.getElementById('f-email').value = admin.email;
+    await loadLog();
+  })();
+</script>
+</body>
+</html>

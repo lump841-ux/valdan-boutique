@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Products — Val & Dan Admin</title>
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="admin.css" />
+<style>
+  .vd-editor { display:none; }
+  .vd-editor.open { display:block; }
+  .vd-icon-btn { font-size:15px; }
+  .vd-tag-input-wrap { display:flex; flex-wrap:wrap; gap:6px; border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:8px; }
+  .vd-tag { background:var(--pink-lt); color:var(--pink-dk); font-size:12px; font-weight:700; padding:4px 9px; border-radius:999px; display:flex; align-items:center; gap:6px; }
+  .vd-tag button { font-size:11px; }
+  .vd-tag-input-wrap input { border:none; flex:1; min-width:80px; padding:4px; font-size:13px; }
+  .vd-tag-input-wrap input:focus { outline:none; }
+  .vd-coll-checks label { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--ink); padding:6px 0; }
+</style>
+</head>
+<body class="vd-admin">
+<div id="vd-config-warning" class="vd-config-warning">⚠️ Supabase isn't connected yet — edit <code>admin/js/config.js</code>. See README-ADMIN.md.</div>
+
+<div class="vd-shell">
+  <aside class="vd-sidebar" id="vd-sidebar">
+    <div class="vd-sidebar-logo"><img src="../logo.jpg" alt="Val & Dan Kids Boutique" /><div><span>Val &amp; Dan</span><small>Admin</small></div></div>
+    <nav class="vd-nav">
+      <a href="dashboard.html"><span class="ic">🏠</span> Dashboard</a>
+      <a href="hero-images.html"><span class="ic">🖼️</span> Hero Images</a>
+      <a href="products.html" class="active"><span class="ic">👕</span> Products</a>
+      <a href="orders.html"><span class="ic">📦</span> Orders</a>
+      <a href="collections.html"><span class="ic">🎀</span> Collections</a>
+      <a href="new-arrivals.html"><span class="ic">✨</span> New Arrivals</a>
+      <a href="media-library.html"><span class="ic">🗂️</span> Media Library</a>
+      <a href="content.html"><span class="ic">📝</span> Website Content</a>
+      <a href="messages.html"><span class="ic">✉️</span> Messages</a>
+      <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
+      <a href="#" class="vd-nav-logout" data-vd-logout><span class="ic">🚪</span> Log Out</a>
+    </nav>
+  </aside>
+
+  <div class="vd-main">
+    <div class="vd-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="vd-mobile-nav-toggle" aria-label="Menu">☰</button>
+        <div><h1>Products</h1><div class="vd-topbar-sub">Add, edit, and organize everything in the shop.</div></div>
+      </div>
+      <div class="vd-topbar-right"><div class="vd-admin-chip"><span class="avatar" id="vd-admin-initial">A</span><span id="vd-admin-name">…</span></div></div>
+    </div>
+
+    <div class="vd-content">
+      <div class="vd-card" id="list-card">
+        <div class="vd-card-hd">
+          <div><h2>All Products</h2><p id="result-count">Loading…</p></div>
+          <button class="btn btn-primary btn-sm" id="btn-add-product">+ Add Product</button>
+        </div>
+        <div class="vd-toolbar">
+          <input type="text" class="vd-search" id="search-input" placeholder="Search by name or SKU…" />
+          <select id="filter-category"><option value="">All Categories</option><option>Girls</option><option>Boys</option><option>Unisex</option><option>Accessories</option><option>Gift Sets</option></select>
+          <select id="filter-status"><option value="">All Statuses</option><option value="published">Published</option><option value="draft">Draft</option><option value="archived">Archived</option></select>
+        </div>
+        <table class="vd-table">
+          <thead><tr><th></th><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th>Flags</th><th></th></tr></thead>
+          <tbody id="product-rows"><tr><td colspan="7" class="vd-empty-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="vd-editor" id="editor">
+        <div class="vd-card">
+          <div class="vd-card-hd">
+            <div><h2 id="editor-title">Add Product</h2><p>Fields marked with a photo icon support multiple images.</p></div>
+            <span class="vd-badge draft" id="editor-badge">Draft</span>
+          </div>
+
+          <div class="vd-field-row">
+            <div class="vd-field"><label>Product Name</label><input type="text" id="f-name" /></div>
+            <div class="vd-field"><label>SKU</label><input type="text" id="f-sku" /></div>
+          </div>
+          <div class="vd-field"><label>Short Description</label><input type="text" id="f-short" maxlength="160" /></div>
+          <div class="vd-field"><label>Full Description</label><textarea id="f-full"></textarea></div>
+
+          <div class="vd-field-row">
+            <div class="vd-field"><label>Price ($)</label><input type="number" step="0.01" min="0" id="f-price" /></div>
+            <div class="vd-field"><label>Sale Price ($) — optional</label><input type="number" step="0.01" min="0" id="f-sale-price" /></div>
+          </div>
+          <div class="vd-field-row">
+            <div class="vd-field"><label>Category</label>
+              <select id="f-category"><option>Girls</option><option>Boys</option><option>Unisex</option><option>Accessories</option><option>Gift Sets</option></select>
+            </div>
+            <div class="vd-field"><label>Department</label>
+              <select id="f-department"><option>Newborn</option><option>Baby</option><option>Toddler</option><option>Kids</option></select>
+            </div>
+          </div>
+          <div class="vd-field-row">
+            <div class="vd-field"><label>Available Sizes</label><div class="vd-tag-input-wrap" id="sizes-wrap"><input type="text" id="sizes-input" placeholder="Type a size, press Enter" /></div></div>
+            <div class="vd-field"><label>Available Colors</label><div class="vd-tag-input-wrap" id="colors-wrap"><input type="text" id="colors-input" placeholder="Type a color, press Enter" /></div></div>
+          </div>
+          <div class="vd-field-row">
+            <div class="vd-field"><label>Inventory Quantity</label><input type="number" min="0" id="f-inventory" /></div>
+            <div class="vd-field"><label>Status</label>
+              <select id="f-status"><option value="draft">Draft</option><option value="published">Published</option><option value="archived">Archived</option></select>
+            </div>
+          </div>
+
+          <div class="vd-checkbox-row"><input type="checkbox" id="f-featured" /><label for="f-featured">Featured product</label></div>
+          <div class="vd-checkbox-row"><input type="checkbox" id="f-new-arrival" /><label for="f-new-arrival">Mark as New Arrival</label></div>
+          <div class="vd-field-row" id="arrival-dates" style="display:none">
+            <div class="vd-field"><label>New Arrival Start</label><input type="date" id="f-arrival-start" /></div>
+            <div class="vd-field"><label>New Arrival End (optional)</label><input type="date" id="f-arrival-end" /></div>
+          </div>
+
+          <div class="vd-field">
+            <label>Collections</label>
+            <div class="vd-coll-checks" id="coll-checks">Loading…</div>
+          </div>
+
+          <div class="vd-field">
+            <label>📷 Product Images (drag to reorder — first image is primary)</label>
+            <div class="vd-drag-list" id="gallery-list"></div>
+            <label class="vd-upload-drop" for="gallery-file-input" style="display:block;margin-top:10px;">📤 Add a photo (JPG, PNG, or WEBP, max 10 MB)</label>
+            <input type="file" id="gallery-file-input" accept="image/jpeg,image/jpg,image/png,image/webp" style="display:none" />
+            <div class="vd-progress" id="upload-progress"><div class="vd-progress-bar" id="upload-progress-bar"></div></div>
+          </div>
+
+          <div class="vd-btn-row" style="margin-top:10px;">
+            <button class="btn btn-outline btn-sm" id="btn-cancel">Cancel</button>
+            <button class="btn btn-outline btn-sm" id="btn-save-draft">Save as Draft</button>
+            <button class="btn btn-primary btn-sm" id="btn-publish">Save &amp; Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/upload.js"></script>
+<script src="js/activity-log.js"></script>
+<script>
+  let allProducts = [];
+  let allCollections = [];
+  let editingProductId = null;
+  let galleryImages = []; // [{id?, media_asset_id, publicUrl, alt_text, is_primary, sort_order, _isNew}]
+  let sizesList = [];
+  let colorsList = [];
+
+  function slugify(s) { return (s || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
+
+  async function loadCollectionsList() {
+    const { data } = await window.sb.from('collections').select('id, title').order('title');
+    allCollections = data || [];
+  }
+
+  async function loadProducts() {
+    const search = document.getElementById('search-input').value.trim();
+    const cat = document.getElementById('filter-category').value;
+    const status = document.getElementById('filter-status').value;
+
+    let q = window.sb.from('products').select('*, product_images(media_asset_id, is_primary, media_assets(public_url))').order('sort_order');
+    if (cat) q = q.eq('category', cat);
+    if (status) q = q.eq('status', status);
+    const { data, error } = await q;
+    allProducts = data || [];
+    if (search) {
+      const s = search.toLowerCase();
+      allProducts = allProducts.filter((p) => p.name?.toLowerCase().includes(s) || p.sku?.toLowerCase().includes(s));
+    }
+    renderProductRows();
+    if (error) vdToast('Could not load products: ' + error.message, 'error');
+  }
+
+  function renderProductRows() {
+    const tbody = document.getElementById('product-rows');
+    document.getElementById('result-count').textContent = allProducts.length + (allProducts.length === 1 ? ' product' : ' products');
+    if (!allProducts.length) {
+      tbody.innerHTML = '<tr class="vd-empty-row"><td colspan="7">No products match yet. Click "+ Add Product" to create one.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = allProducts.map((p) => {
+      const primary = (p.product_images || []).find((i) => i.is_primary) || p.product_images?.[0];
+      const thumb = primary?.media_assets?.public_url;
+      const flags = [p.is_featured ? '⭐' : '', p.is_new_arrival ? '✨' : ''].filter(Boolean).join(' ');
+      return `
+        <tr>
+          <td>${thumb ? `<img class="thumb" src="${thumb}" alt="" />` : ''}</td>
+          <td>${p.name}</td>
+          <td>${p.category || '—'}</td>
+          <td>${p.sale_price ? `<s>$${Number(p.price).toFixed(2)}</s> $${Number(p.sale_price).toFixed(2)}` : '$' + Number(p.price).toFixed(2)}</td>
+          <td><span class="vd-badge ${p.status}">${p.status}</span></td>
+          <td>${flags || '—'}</td>
+          <td class="vd-table-actions">
+            <button data-edit="${p.id}">Edit</button>
+            <button data-dup="${p.id}">Duplicate</button>
+            <button class="danger" data-del="${p.id}">Delete</button>
+          </td>
+        </tr>`;
+    }).join('');
+
+    tbody.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => openEditor(b.getAttribute('data-edit'))));
+    tbody.querySelectorAll('[data-dup]').forEach((b) => b.addEventListener('click', () => duplicateProduct(b.getAttribute('data-dup'))));
+    tbody.querySelectorAll('[data-del]').forEach((b) => b.addEventListener('click', () => deleteProduct(b.getAttribute('data-del'))));
+  }
+
+  function renderTagWrap(wrapId, list) {
+    const wrap = document.getElementById(wrapId);
+    const input = wrap.querySelector('input');
+    wrap.querySelectorAll('.vd-tag').forEach((t) => t.remove());
+    list.forEach((val, idx) => {
+      const tag = document.createElement('span');
+      tag.className = 'vd-tag';
+      tag.innerHTML = `${val} <button type="button" data-idx="${idx}">✕</button>`;
+      wrap.insertBefore(tag, input);
+    });
+    wrap.querySelectorAll('button[data-idx]').forEach((btn) => btn.addEventListener('click', () => {
+      const idx = Number(btn.getAttribute('data-idx'));
+      list.splice(idx, 1);
+      renderTagWrap(wrapId, list);
+    }));
+  }
+  function wireTagInput(inputId, wrapId, list) {
+    document.getElementById(inputId).addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.value.trim()) {
+        e.preventDefault();
+        list.push(e.target.value.trim());
+        e.target.value = '';
+        renderTagWrap(wrapId, list);
+      }
+    });
+  }
+  wireTagInput('sizes-input', 'sizes-wrap', sizesList);
+  wireTagInput('colors-input', 'colors-wrap', colorsList);
+
+  function renderCollectionChecks(selectedIds) {
+    const wrap = document.getElementById('coll-checks');
+    if (!allCollections.length) { wrap.textContent = 'No collections yet — create one on the Collections page.'; return; }
+    wrap.innerHTML = allCollections.map((c) => `
+      <label><input type="checkbox" value="${c.id}" ${selectedIds.includes(c.id) ? 'checked' : ''} /> ${c.title}</label>
+    `).join('');
+  }
+
+  function renderGallery() {
+    const list = document.getElementById('gallery-list');
+    if (!galleryImages.length) { list.innerHTML = '<p class="hint">No photos yet — add at least one below.</p>'; return; }
+    list.innerHTML = galleryImages.map((img, idx) => `
+      <div class="vd-drag-item" draggable="true" data-idx="${idx}">
+        <span class="vd-drag-handle">⠿</span>
+        <img src="${img.publicUrl}" alt="" />
+        <input type="text" data-alt-idx="${idx}" value="${img.alt_text || ''}" placeholder="Alt text" style="flex:1;border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12.5px;" />
+        <span style="font-size:11px;color:var(--ink-3);white-space:nowrap;">${idx === 0 ? 'Primary' : ''}</span>
+        <button type="button" data-remove-idx="${idx}" style="color:#C4423D;font-size:12px;font-weight:700;">Remove</button>
+      </div>`).join('');
+
+    list.querySelectorAll('[data-alt-idx]').forEach((inp) => inp.addEventListener('input', (e) => {
+      galleryImages[Number(e.target.getAttribute('data-alt-idx'))].alt_text = e.target.value;
+    }));
+    list.querySelectorAll('[data-remove-idx]').forEach((btn) => btn.addEventListener('click', () => {
+      galleryImages.splice(Number(btn.getAttribute('data-remove-idx')), 1);
+      renderGallery();
+    }));
+
+    let dragIdx = null;
+    list.querySelectorAll('.vd-drag-item').forEach((item) => {
+      item.addEventListener('dragstart', () => { dragIdx = Number(item.getAttribute('data-idx')); item.classList.add('dragging'); });
+      item.addEventListener('dragend', () => item.classList.remove('dragging'));
+      item.addEventListener('dragover', (e) => e.preventDefault());
+      item.addEventListener('drop', () => {
+        const dropIdx = Number(item.getAttribute('data-idx'));
+        if (dragIdx === null || dragIdx === dropIdx) return;
+        const moved = galleryImages.splice(dragIdx, 1)[0];
+        galleryImages.splice(dropIdx, 0, moved);
+        renderGallery();
+      });
+    });
+  }
+
+  document.getElementById('gallery-file-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const err = vdValidateImageFile(file);
+    if (err) { vdToast(err, 'error'); e.target.value = ''; return; }
+    const folder = editingProductId || 'new-' + Date.now();
+    const progressWrap = document.getElementById('upload-progress');
+    const progressBar = document.getElementById('upload-progress-bar');
+    progressWrap.style.display = 'block';
+    e.target.disabled = true;
+    const { data: asset, error } = await vdUploadImage('products', folder, file, 'product', (pct) => { progressBar.style.width = pct + '%'; });
+    e.target.disabled = false; e.target.value = '';
+    setTimeout(() => { progressWrap.style.display = 'none'; progressBar.style.width = '0%'; }, 500);
+    if (error) { vdToast(error, 'error'); return; }
+    galleryImages.push({ media_asset_id: asset.id, publicUrl: asset.public_url, alt_text: '', is_primary: galleryImages.length === 0, sort_order: galleryImages.length, _isNew: true });
+    renderGallery();
+    vdToast('Image uploaded successfully.', 'success');
+  });
+
+  function resetEditorForm() {
+    editingProductId = null;
+    galleryImages = [];
+    sizesList = []; colorsList = [];
+    ['f-name','f-sku','f-short','f-full','f-price','f-sale-price','f-inventory','f-arrival-start','f-arrival-end'].forEach((id) => document.getElementById(id).value = '');
+    document.getElementById('f-category').value = 'Girls';
+    document.getElementById('f-department').value = 'Baby';
+    document.getElementById('f-status').value = 'draft';
+    document.getElementById('f-featured').checked = false;
+    document.getElementById('f-new-arrival').checked = false;
+    document.getElementById('arrival-dates').style.display = 'none';
+    renderTagWrap('sizes-wrap', sizesList);
+    renderTagWrap('colors-wrap', colorsList);
+    renderGallery();
+    renderCollectionChecks([]);
+    document.getElementById('editor-title').textContent = 'Add Product';
+    document.getElementById('editor-badge').className = 'vd-badge draft';
+    document.getElementById('editor-badge').textContent = 'New';
+  }
+
+  async function openEditor(productId) {
+    resetEditorForm();
+    document.getElementById('editor').classList.add('open');
+
+    if (productId) {
+      editingProductId = productId;
+      const { data: p } = await window.sb.from('products').select('*, product_images(*, media_assets(public_url))').eq('id', productId).single();
+      const { data: links } = await window.sb.from('collection_products').select('collection_id').eq('product_id', productId);
+
+      document.getElementById('f-name').value = p.name || '';
+      document.getElementById('f-sku').value = p.sku || '';
+      document.getElementById('f-short').value = p.short_description || '';
+      document.getElementById('f-full').value = p.full_description || '';
+      document.getElementById('f-price').value = p.price ?? '';
+      document.getElementById('f-sale-price').value = p.sale_price ?? '';
+      document.getElementById('f-category').value = p.category || 'Girls';
+      document.getElementById('f-department').value = p.department || 'Baby';
+      document.getElementById('f-inventory').value = p.inventory_qty ?? 0;
+      document.getElementById('f-status').value = p.status || 'draft';
+      document.getElementById('f-featured').checked = !!p.is_featured;
+      document.getElementById('f-new-arrival').checked = !!p.is_new_arrival;
+      document.getElementById('arrival-dates').style.display = p.is_new_arrival ? 'grid' : 'none';
+      document.getElementById('f-arrival-start').value = p.new_arrival_start || '';
+      document.getElementById('f-arrival-end').value = p.new_arrival_end || '';
+      sizesList = [...(p.sizes || [])];
+      colorsList = [...(p.colors || [])];
+      renderTagWrap('sizes-wrap', sizesList);
+      renderTagWrap('colors-wrap', colorsList);
+      galleryImages = (p.product_images || [])
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((img) => ({ id: img.id, media_asset_id: img.media_asset_id, publicUrl: img.media_assets?.public_url, alt_text: img.alt_text, is_primary: img.is_primary, sort_order: img.sort_order }));
+      renderGallery();
+      renderCollectionChecks((links || []).map((l) => l.collection_id));
+
+      document.getElementById('editor-title').textContent = 'Edit — ' + p.name;
+      const b = document.getElementById('editor-badge');
+      b.className = 'vd-badge ' + p.status; b.textContent = p.status;
+    } else {
+      renderCollectionChecks([]);
+    }
+    document.getElementById('editor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.getElementById('f-new-arrival').addEventListener('change', (e) => {
+    document.getElementById('arrival-dates').style.display = e.target.checked ? 'grid' : 'none';
+  });
+
+  document.getElementById('btn-add-product').addEventListener('click', () => openEditor(null));
+  document.getElementById('btn-cancel').addEventListener('click', () => document.getElementById('editor').classList.remove('open'));
+
+  async function saveProduct(status) {
+    const name = document.getElementById('f-name').value.trim();
+    if (!name) { vdToast('Product name is required.', 'error'); return; }
+    if (!galleryImages.length) { vdToast('Add at least one product photo.', 'error'); return; }
+
+    const payload = {
+      name,
+      slug: slugify(name) + (editingProductId ? '' : '-' + Date.now().toString(36)),
+      sku: document.getElementById('f-sku').value.trim() || null,
+      short_description: document.getElementById('f-short').value.trim(),
+      full_description: document.getElementById('f-full').value.trim(),
+      price: parseFloat(document.getElementById('f-price').value) || 0,
+      sale_price: document.getElementById('f-sale-price').value ? parseFloat(document.getElementById('f-sale-price').value) : null,
+      category: document.getElementById('f-category').value,
+      department: document.getElementById('f-department').value,
+      sizes: sizesList,
+      colors: colorsList,
+      inventory_qty: parseInt(document.getElementById('f-inventory').value, 10) || 0,
+      status,
+      is_featured: document.getElementById('f-featured').checked,
+      is_new_arrival: document.getElementById('f-new-arrival').checked,
+      new_arrival_start: document.getElementById('f-arrival-start').value || null,
+      new_arrival_end: document.getElementById('f-arrival-end').value || null,
+      updated_by: window.vdCurrentAdmin.id,
+    };
+
+    let productId = editingProductId;
+    if (productId) {
+      const { error } = await window.sb.from('products').update(payload).eq('id', productId);
+      if (error) { vdToast('Could not save: ' + error.message, 'error'); return false; }
+    } else {
+      payload.created_by = window.vdCurrentAdmin.id;
+      const { data, error } = await window.sb.from('products').insert(payload).select().single();
+      if (error) { vdToast('Could not save: ' + error.message, 'error'); return false; }
+      productId = data.id;
+    }
+
+    // Replace product_images rows to match the current gallery state.
+    await window.sb.from('product_images').delete().eq('product_id', productId);
+    if (galleryImages.length) {
+      const rows = galleryImages.map((img, idx) => ({
+        product_id: productId, media_asset_id: img.media_asset_id, alt_text: img.alt_text || '',
+        is_primary: idx === 0, sort_order: idx,
+      }));
+      await window.sb.from('product_images').insert(rows);
+    }
+
+    // Sync collection assignments.
+    const checkedIds = Array.from(document.querySelectorAll('#coll-checks input:checked')).map((c) => c.value);
+    await window.sb.from('collection_products').delete().eq('product_id', productId);
+    if (checkedIds.length) {
+      await window.sb.from('collection_products').insert(checkedIds.map((cid, idx) => ({ collection_id: cid, product_id: productId, sort_order: idx })));
+    }
+
+    await vdLogActivity(editingProductId ? 'product.update' : 'product.create', 'product', productId, { name });
+    return true;
+  }
+
+  document.getElementById('btn-save-draft').addEventListener('click', async (e) => {
+    const btn = e.currentTarget; btn.disabled = true; btn.textContent = 'Saving…';
+    const ok = await saveProduct('draft');
+    btn.disabled = false; btn.textContent = 'Save as Draft';
+    if (ok) { vdToast('Changes saved as a draft.', 'success'); document.getElementById('editor').classList.remove('open'); loadProducts(); }
+  });
+  document.getElementById('btn-publish').addEventListener('click', async (e) => {
+    const btn = e.currentTarget; btn.disabled = true; btn.textContent = 'Publishing…';
+    const ok = await saveProduct('published');
+    btn.disabled = false; btn.textContent = 'Save & Publish';
+    if (ok) {
+      await vdLogActivity('product.publish', 'product', editingProductId, {});
+      vdToast('Product published successfully.', 'success');
+      document.getElementById('editor').classList.remove('open');
+      loadProducts();
+    }
+  });
+
+  async function duplicateProduct(id) {
+    const { data: p } = await window.sb.from('products').select('*, product_images(*)').eq('id', id).single();
+    const { data: links } = await window.sb.from('collection_products').select('collection_id').eq('product_id', id);
+    const copy = { ...p };
+    delete copy.id; delete copy.created_at; delete copy.updated_at;
+    copy.name = p.name + ' (Copy)';
+    copy.slug = slugify(copy.name) + '-' + Date.now().toString(36);
+    copy.sku = null;
+    copy.status = 'draft';
+    delete copy.product_images;
+    const { data: newProd, error } = await window.sb.from('products').insert(copy).select().single();
+    if (error) { vdToast('Could not duplicate: ' + error.message, 'error'); return; }
+    if (p.product_images?.length) {
+      await window.sb.from('product_images').insert(p.product_images.map((img) => ({
+        product_id: newProd.id, media_asset_id: img.media_asset_id, alt_text: img.alt_text, is_primary: img.is_primary, sort_order: img.sort_order,
+      })));
+    }
+    if (links?.length) {
+      await window.sb.from('collection_products').insert(links.map((l) => ({ collection_id: l.collection_id, product_id: newProd.id, sort_order: 0 })));
+    }
+    await vdLogActivity('product.create', 'product', newProd.id, { duplicatedFrom: id });
+    vdToast('Product duplicated as a draft.', 'success');
+    loadProducts();
+  }
+
+  async function deleteProduct(id) {
+    const p = allProducts.find((x) => x.id === id);
+    const ok = await vdConfirm({ title: 'Delete this product?', body: `"${p?.name}" will be permanently removed from the shop. Its photos will stay in your Media Library.`, confirmLabel: 'Delete Product' });
+    if (!ok) return;
+    const { error } = await window.sb.from('products').delete().eq('id', id);
+    if (error) { vdToast('Could not delete: ' + error.message, 'error'); return; }
+    await vdLogActivity('product.delete', 'product', id, { name: p?.name });
+    vdToast('Product deleted.', 'success');
+    loadProducts();
+  }
+
+  document.getElementById('search-input').addEventListener('input', debounce(loadProducts, 300));
+  document.getElementById('filter-category').addEventListener('change', loadProducts);
+  document.getElementById('filter-status').addEventListener('change', loadProducts);
+  function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+  (async function init() {
+    const admin = await vdRequireAdmin();
+    if (!admin) return;
+    document.getElementById('vd-admin-initial').textContent = (admin.full_name || admin.email).charAt(0).toUpperCase();
+    await loadCollectionsList();
+    await loadProducts();
+  })();
+</script>
+</body>
+</html>

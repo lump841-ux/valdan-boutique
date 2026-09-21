@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Seasonal Favorites — Val &amp; Dan Kids Boutique</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- PROMO BAR -->
+<div class="promo-bar">
+  <div class="container">
+    <p>✨ Free shipping on all orders over $60 • Use code: <strong>LITTLEFERNS</strong> ✨</p>
+  </div>
+</div>
+
+<!-- PAGE NAV: plain bar (not overlaid on a photo) — matches the Figma
+     "[Collections] val-dan-seasonal-favorites-collection" frame's navigation exactly. -->
+<div class="fig-page-nav-wrap">
+  <nav class="fig-nav">
+    <div class="fig-nav-left">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="collections.html" class="active">Collections</a>
+      <a href="about.html">Our Story</a>
+    </div>
+    <a href="index.html" class="fig-nav-logo">
+      <img src="logo-transparent.png" alt="Val &amp; Dan Kids Boutique" />
+    </a>
+    <div class="fig-nav-right">
+      <a href="shop.html" aria-label="Search">🔍</a>
+      <a href="account.html" aria-label="Account">👤</a>
+      <a href="cart.html" aria-label="Cart" class="fig-nav-cart">
+        🛍️<span class="fig-cart-badge" id="cart-count">0</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</div>
+
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="collections.html">Collections</a>
+  <a href="about.html">Our Story</a>
+</div>
+
+<!-- SHOP CONTENT: breadcrumbs → intro box → sidebar/grid split layout —
+     matches the Figma "shop-content-container" exactly. -->
+<div class="fig-shop-content">
+  <div class="container">
+    <nav class="fig-breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a>
+      <span>/</span>
+      <a href="collections.html">Collections</a>
+      <span>/</span>
+      <span class="current">Seasonal Favorites</span>
+    </nav>
+
+    <div class="fig-shop-intro">
+      <h1>Seasonal Favorites</h1>
+      <p>Bespoke, hand-crafted layers and magical woodland knits perfect for every festive moment. Each limited-edition heirloom piece is knit to keep your little adventurer warm through crisp winter days and holiday memories.</p>
+    </div>
+
+    <div class="fig-shop-layout">
+      <aside class="fig-shop-sidebar">
+        <div class="fig-filter-group">
+          <h4>Categories</h4>
+          <div class="fig-cat-options" id="fig-cat-options">
+            <button type="button" class="fig-cat-option active" data-cat="All">
+              <span class="fig-cat-dot"></span>All Seasonal Styles
+            </button>
+            <button type="button" class="fig-cat-option" data-cat="Holiday Knits">
+              <span class="fig-cat-dot"></span>Holiday Knits
+            </button>
+            <button type="button" class="fig-cat-option" data-cat="Festive Dresses">
+              <span class="fig-cat-dot"></span>Festive Dresses
+            </button>
+            <button type="button" class="fig-cat-option" data-cat="Winter Warmers">
+              <span class="fig-cat-dot"></span>Winter Warmers
+            </button>
+            <button type="button" class="fig-cat-option" data-cat="Woodland Collection">
+              <span class="fig-cat-dot"></span>Woodland Collection
+            </button>
+          </div>
+        </div>
+
+        <div class="fig-filter-group">
+          <h4>Sizes</h4>
+          <div class="fig-size-pills" id="fig-size-pills">
+            <button type="button" class="fig-size-pill" data-size="NB">Newborn</button>
+            <button type="button" class="fig-size-pill" data-size="0-3M">0-3 Mos</button>
+            <button type="button" class="fig-size-pill active" data-size="3-6M">3-6 Mos</button>
+            <button type="button" class="fig-size-pill" data-size="6-12M">6-12 Mos</button>
+            <button type="button" class="fig-size-pill" data-size="12-18M">12-18 Mos</button>
+            <button type="button" class="fig-size-pill" data-size="2T">2T</button>
+            <button type="button" class="fig-size-pill" data-size="3T">3T</button>
+          </div>
+        </div>
+
+        <div class="fig-filter-group">
+          <h4>Color Palette</h4>
+          <div class="fig-color-row">
+            <span class="fig-color-dot" style="background:var(--pink-lt)"></span>
+            <span class="fig-color-dot" style="background:var(--pink)"></span>
+            <span class="fig-color-dot" style="background:#EBE3F3"></span>
+            <span class="fig-color-dot" style="background:#FFFFFF"></span>
+          </div>
+        </div>
+
+        <button type="button" class="fig-reset-filters" id="fig-reset-filters">Reset All Filters</button>
+      </aside>
+
+      <div class="fig-shop-grid-area">
+        <div class="fig-shop-toolbar">
+          <span class="fig-shop-count" id="fig-shop-count">Showing 1–6 of 12 magical heirlooms</span>
+          <div class="fig-sort-wrap">
+            <span>Sort by:</span>
+            <select class="fig-sort-select" id="fig-sort-select">
+              <option value="featured">New Arrivals ♡</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="name">Name: A–Z</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="fig-item-grid" id="fig-item-grid"></div>
+        <div class="empty" id="fig-item-empty" style="display:none">
+          <div class="icon">🔍</div>
+          <h3>No products match your filters</h3>
+          <p>Try a different category or clear the filter.</p>
+        </div>
+
+        <div class="fig-shop-pagination">
+          <span class="fig-page-num active">1</span>
+          <span class="fig-page-num">2</span>
+          <span class="fig-page-num fig-page-next">Next →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRUST BAR -->
+<section class="fig-trust-bar">
+  <div class="container">
+    <div class="fig-trust-grid">
+      <div class="fig-trust-item">
+        <div class="fig-trust-icon">🌱</div>
+        <div class="fig-trust-txt"><div class="lbl">100% GOTS Organic</div><div class="sub">Certified pure organic cotton</div></div>
+      </div>
+      <div class="fig-trust-item">
+        <div class="fig-trust-icon">📦</div>
+        <div class="fig-trust-txt"><div class="lbl">Plastic-Free Packaging</div><div class="sub">Zero harsh synthetic residues</div></div>
+      </div>
+      <div class="fig-trust-item">
+        <div class="fig-trust-icon">🌍</div>
+        <div class="fig-trust-txt"><div class="lbl">Carbon Neutral Shipping</div><div class="sub">Committed to green delivery</div></div>
+      </div>
+      <div class="fig-trust-item">
+        <div class="fig-trust-icon">🤝</div>
+        <div class="fig-trust-txt"><div class="lbl">Ethically Manufactured</div><div class="sub">Fair trade production certified</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="fig-footer">
+  <div class="container">
+    <div class="fig-footer-cols">
+      <div class="fig-footer-brand">
+        <h3>Val &amp; Dan's Kids Boutique</h3>
+        <p>Crafting premium organic children's wear that honors soft skin and sweet moments. Beautiful heirloom styles created sustainably.</p>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All Clothing</a></li>
+          <li><a href="princess-collection.html">Princess Dresses</a></li>
+          <li><a href="seasonal-favorites-collection.html">Woodland Knits</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Help</h4>
+        <ul>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">Shipping &amp; Returns</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col fig-footer-subscribe">
+        <h4>Subscribe</h4>
+        <p>Join our newsletter for sweet deals &amp; woodland storybook updates.</p>
+        <form onsubmit="event.preventDefault(); showToast('Welcome to the family! Check your inbox 💗'); this.reset();">
+          <input type="email" placeholder="Your email address" required />
+        </form>
+      </div>
+    </div>
+    <div class="fig-footer-rule"></div>
+    <div class="fig-footer-bottom">
+      <span>© 2025 Val &amp; Dan Kids Boutique. All rights reserved.</span>
+      <span>Privacy Policy • Terms of Service</span>
+    </div>
+  </div>
+</footer>
+
+<!-- QUICK VIEW MODAL -->
+<div class="qv-modal-overlay" id="qv-overlay">
+  <div class="qv-modal">
+    <button class="qv-close" id="qv-close">✕</button>
+    <img id="qv-img" src="" alt="" />
+    <div class="qv-modal-info">
+      <div class="cat" id="qv-cat"></div>
+      <h3 id="qv-name"></h3>
+      <div class="price" id="qv-price"></div>
+      <p id="qv-desc"></p>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" id="qv-add" style="flex:1">Add to Cart</button>
+        <a class="btn btn-outline" id="qv-view-full" href="#" style="flex:1;text-align:center">View Full Details</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="site-data.js"></script>
+<script src="shop.js"></script>
+<script>
+  vdApplySiteContent();
+
+(function () {
+  const COLLECTION_NAME = 'Seasonal Favorites';
+  const CATEGORY_MATCHERS = {
+    All: () => true,
+    'Holiday Knits': (p) => p.category === 'Holiday Knits',
+    'Festive Dresses': (p) => p.category === 'Festive Dresses',
+    'Winter Warmers': (p) => p.category === 'Winter Warmers',
+    'Woodland Collection': (p) => p.category === 'Woodland Collection',
+  };
+
+  let activeCategory = 'All';
+  let activeSize = '3-6M';
+
+  function figItemCardHTML(p) {
+    const wished = isWishlisted(p.id);
+    return `
+      <div class="fig-item-card" data-id="${p.id}">
+        <div class="fig-item-photo">
+          <a href="product.html?id=${p.id}"><img src="${p.img}" alt="${p.name}" loading="lazy" /></a>
+          ${p.badge ? `<span class="fig-item-badge">${p.badge}</span>` : ''}
+          <button class="fig-item-heart ${wished ? 'active' : ''}" data-wish="${p.id}" aria-label="Add to wishlist">${wished ? '♥' : '♡'}</button>
+        </div>
+        <div class="fig-item-info">
+          <div class="fig-item-name"><a href="product.html?id=${p.id}">${p.name}</a></div>
+          <div class="fig-item-price">$${p.price.toFixed(2)}</div>
+        </div>
+      </div>`;
+  }
+
+  function matches(p) {
+    const catOk = CATEGORY_MATCHERS[activeCategory] ? CATEGORY_MATCHERS[activeCategory](p) : true;
+    const sizeOk = !activeSize || (p.sizes || []).includes(activeSize);
+    return catOk && sizeOk;
+  }
+
+  function render() {
+    const sort = document.getElementById('fig-sort-select').value;
+    let list = ALL_PRODUCTS.filter(p => p.collection === COLLECTION_NAME).filter(matches);
+
+    if (sort === 'price-asc') list = [...list].sort((a, b) => a.price - b.price);
+    else if (sort === 'price-desc') list = [...list].sort((a, b) => b.price - a.price);
+    else if (sort === 'name') list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+
+    const total = list.length;
+    document.getElementById('fig-shop-count').textContent =
+      total === 0 ? 'No seasonal favorites found' : `Showing 1–${Math.min(total, 6)} of ${total} magical heirloom${total === 1 ? '' : 's'}`;
+
+    const grid = document.getElementById('fig-item-grid');
+    const empty = document.getElementById('fig-item-empty');
+    if (total === 0) {
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      grid.innerHTML = list.map(figItemCardHTML).join('');
+      wireWishButtons(grid);
+    }
+  }
+
+  document.querySelectorAll('.fig-cat-option').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      activeCategory = btn.getAttribute('data-cat');
+      document.querySelectorAll('.fig-cat-option').forEach((b) => b.classList.toggle('active', b === btn));
+      render();
+    });
+  });
+
+  document.querySelectorAll('.fig-size-pill').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const size = btn.getAttribute('data-size');
+      const turningOn = !btn.classList.contains('active');
+      document.querySelectorAll('.fig-size-pill').forEach((b) => b.classList.remove('active'));
+      activeSize = turningOn ? size : null;
+      if (turningOn) btn.classList.add('active');
+      render();
+    });
+  });
+
+  document.getElementById('fig-sort-select').addEventListener('change', render);
+
+  document.getElementById('fig-reset-filters').addEventListener('click', () => {
+    activeCategory = 'All';
+    activeSize = null;
+    document.getElementById('fig-sort-select').value = 'featured';
+    document.querySelectorAll('.fig-cat-option').forEach((b) => b.classList.toggle('active', b.getAttribute('data-cat') === 'All'));
+    document.querySelectorAll('.fig-size-pill').forEach((b) => b.classList.remove('active'));
+    render();
+  });
+
+  window.vdRerenderCatalog = render;
+  render();
+})();
+</script>
+</body>
+</html>

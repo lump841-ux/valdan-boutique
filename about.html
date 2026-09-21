@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About Us — Val & Dan Kids Boutique</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- PROMO BAR -->
+<div class="promo-bar">
+  <div class="container">
+    <p>✨ Free shipping on all orders over $60 • Use code: <strong>LITTLEFERNS</strong> ✨</p>
+  </div>
+</div>
+
+<!-- PAGE NAV: plain bar (not overlaid on a photo) — matches the Figma
+     "[About & Contact] val-dan-about-us" frame's navigation section. -->
+<div class="fig-page-nav-wrap">
+  <nav class="fig-nav">
+    <div class="fig-nav-left">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="collections.html">Collections</a>
+      <a href="about.html" class="active">Our Story</a>
+    </div>
+    <a href="index.html" class="fig-nav-logo">
+      <img src="logo-transparent.png" alt="Val &amp; Dan Kids Boutique" />
+    </a>
+    <div class="fig-nav-right">
+      <a href="shop.html" aria-label="Search">🔍</a>
+      <a href="account.html" aria-label="Account">👤</a>
+      <a href="cart.html" aria-label="Cart" class="fig-nav-cart">
+        🛍️<span class="fig-cart-badge" id="cart-count">0</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</div>
+
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="collections.html">Collections</a>
+  <a href="about.html">Our Story</a>
+</div>
+
+<!-- ABOUT HERO: full-bleed photo with a dark scrim and centered copy —
+     matches the Figma "about-hero" section exactly. -->
+<section class="fig-about-hero">
+  <img id="about-hero-img" src="about-hero.jpg" alt="Val &amp; Dan Kids Boutique — a warm, modern children's boutique interior with carefully arranged clothing displays" />
+  <div class="fig-about-hero-content">
+    <h1>Woven with love, made for memory making ♡</h1>
+    <p>The story behind Val &amp; Dan, from soft daydreams to sweet, sustainable boutique styles for your littlest ones.</p>
+  </div>
+</section>
+
+<!-- MISSION: narrative copy + photo split -->
+<section class="fade-in-up fig-mission-section">
+  <div class="fig-mission-content">
+    <span class="eyebrow">Our Humble Beginnings</span>
+    <h2>Honoring the softness of delicate skin</h2>
+    <p>At Val &amp; Dan, we believe every stitch tells a story. Born from a mother's desire to dress her children in fabrics as gentle as a woodland breeze, our collections are crafted from 100% GOTS-certified organic cotton, plant-dyed linens, and responsibly sourced wool. Every garment is designed in our Portland studio and made by artisan partners who share our commitment to fair wages and sustainable practices. We don't chase trends — we create timeless pieces that grow with your little ones, meant to be worn, loved, and passed down.</p>
+    <p>Every hand-embroidered rose, delicate ribbon, and organic seam is designed to accompany your children through all their lovely milestones. We believe baby clothing shouldn't just be pretty—it should support their natural impulse to explore, stretch, and dream.</p>
+  </div>
+  <div class="fig-mission-image">
+    <img src="about-mission.jpg" alt="Hand-folding soft organic baby clothing" />
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="fade-in-up fig-values-section">
+  <div class="fig-values-header">
+    <span class="eyebrow">Our Promise To You</span>
+    <h2>Values We Stand By</h2>
+  </div>
+  <div class="fig-values-row">
+    <div class="fig-value-card">
+      <div class="fig-value-icon">🌿</div>
+      <h3>100% Organic GOTS</h3>
+      <p>Every fabric is certified to the highest organic standard, free from harmful chemicals and pesticides.</p>
+    </div>
+    <div class="fig-value-card">
+      <div class="fig-value-icon">♻️</div>
+      <h3>Zero Waste Packaging</h3>
+      <p>All our packaging is compostable or recyclable. No plastic, ever.</p>
+    </div>
+    <div class="fig-value-card">
+      <div class="fig-value-icon">🛡️</div>
+      <h3>Kindness in Every Stitch</h3>
+      <p>Our artisan partners earn living wages in safe, dignified workshops.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MEET THE FOUNDERS -->
+<section class="fade-in-up fig-founders-section">
+  <div class="fig-founders-header">
+    <span class="eyebrow">Behind the Designs</span>
+    <h2>Meet our Founders</h2>
+  </div>
+  <div class="fig-founders-row">
+    <div class="fig-founder-profile">
+      <div class="fig-founder-image">
+        <img src="about-founder-elara.jpg" alt="Val, Co-Founder" />
+      </div>
+      <div class="fig-founder-info">
+        <div class="name">Val</div>
+        <div class="role">Co-Founder &amp; Creative Director</div>
+      </div>
+      <p class="quote">"Designing each collection brings back the magic of reading my children's first storybooks. I hope these clothes make your moments just as cozy."</p>
+    </div>
+    <div class="fig-founder-profile">
+      <div class="fig-founder-image">
+        <img src="about-founder-jonas.jpg" alt="Dan, Co-Founder" />
+      </div>
+      <div class="fig-founder-info">
+        <div class="name">Dan</div>
+        <div class="role">Co-Founder &amp; Head of Sustainability</div>
+      </div>
+      <p class="quote">"We make sure our ethical promise is carried through every shipping box, tag, and transaction. High quality shouldn't compromise the environment."</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="fade-in-up fig-about-cta">
+  <h2>Join the Val &amp; Dan Family</h2>
+  <p>Be the first to know about new collections, seasonal stories, and family-exclusive offers.</p>
+  <a href="shop.html" class="fig-about-cta-btn">Shop the Collection ♡</a>
+</section>
+
+<!-- FOOTER -->
+<footer class="fig-footer">
+  <div class="container">
+    <div class="fig-footer-cols">
+      <div class="fig-footer-brand">
+        <h3>Val &amp; Dan's Kids Boutique</h3>
+        <p>Crafting premium organic children's wear that honors soft skin and sweet moments. Beautiful styles created sustainably.</p>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All Clothing</a></li>
+          <li><a href="shop.html?category=Boys">Baby Rompers</a></li>
+          <li><a href="shop.html?category=Gift+Sets">Gift Sets</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Help</h4>
+        <ul>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">Shipping &amp; Returns</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col fig-footer-subscribe">
+        <h4>Subscribe</h4>
+        <p>Join our newsletter for sweet deals &amp; storybook updates.</p>
+        <form onsubmit="event.preventDefault(); showToast('Welcome to the family! Check your inbox 💗'); this.reset();">
+          <input type="email" placeholder="Your email address" required />
+          <button type="submit" class="fig-footer-subscribe-btn" aria-label="Subscribe">→</button>
+        </form>
+      </div>
+    </div>
+    <div class="fig-footer-rule"></div>
+    <div class="fig-footer-bottom">
+      <span>© 2025 Val &amp; Dan Kids Boutique. All rights reserved.</span>
+      <span>Privacy Policy • Terms of Service</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="site-data.js"></script>
+<script src="shop.js"></script>
+<script>
+  vdApplyHeroImage('about', document.getElementById('about-hero-img'));
+  vdApplySiteContent();
+</script>
+</body>
+</html>

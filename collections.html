@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Explore Our Collections — Val & Dan Kids Boutique</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- PROMO BAR -->
+<div class="promo-bar">
+  <div class="container">
+    <p>✨ Free shipping on all orders over $60 • Use code: <strong>LITTLEFERNS</strong> ✨</p>
+  </div>
+</div>
+
+<!-- PAGE NAV: plain bar, matches the Figma "[Collections] val-dan-explore-collections" frame -->
+<div class="fig-page-nav-wrap">
+  <nav class="fig-nav">
+    <div class="fig-nav-left">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="collections.html" class="active">Collections</a>
+      <a href="about.html">Our Story</a>
+    </div>
+    <a href="index.html" class="fig-nav-logo">
+      <img src="logo-transparent.png" alt="Val &amp; Dan Kids Boutique" />
+    </a>
+    <div class="fig-nav-right">
+      <a href="shop.html" aria-label="Search">🔍</a>
+      <a href="account.html" aria-label="Account">👤</a>
+      <a href="cart.html" aria-label="Cart" class="fig-nav-cart">
+        🛍️<span class="fig-cart-badge" id="cart-count">0</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</div>
+
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="collections.html">Collections</a>
+  <a href="about.html">Our Story</a>
+</div>
+
+<!-- COLLECTIONS HERO: centered text block, no photo -->
+<section class="fig-coll-hero">
+  <div class="container">
+    <span class="fig-eyebrow">curated dreamwear</span>
+    <h1>Explore Our Collections</h1>
+    <p>Discover premium heirloom garments designed with soft organic fabrics, charming details, and timeless layouts to honor your little explorer's sweetest milestones.</p>
+  </div>
+</section>
+
+<!-- COLLECTIONS GRID: 6 cards, 3-up -->
+<section class="fig-coll-grid-section">
+  <div class="container">
+    <div class="fig-coll-grid">
+      <a class="fig-coll-card" href="princess-collection.html">
+        <div class="fig-coll-photo">
+          <img src="collection-princess.jpg" alt="Princess Collection" />
+          <span class="fig-coll-count">12 items</span>
+        </div>
+        <div class="fig-coll-text">
+          <h3>Princess Collection</h3>
+          <p>Sweet looks, dreamy tulle, and lovely pastel rompers for your sweet baby girl.</p>
+        </div>
+        <div class="fig-coll-footer">Shop Now →</div>
+      </a>
+      <a class="fig-coll-card" href="little-gentleman-collection.html">
+        <div class="fig-coll-photo">
+          <img src="collection-gentleman.jpg" alt="Little Gentleman" />
+          <span class="fig-coll-count">10 items</span>
+        </div>
+        <div class="fig-coll-text">
+          <h3>Little Gentleman</h3>
+          <p>Classic overalls, collared sets, and dapper styles made for your charming boy.</p>
+        </div>
+        <div class="fig-coll-footer">Shop Now →</div>
+      </a>
+      <a class="fig-coll-card" href="cozy-essentials-collection.html">
+        <div class="fig-coll-photo">
+          <img src="collection-cozy.jpg" alt="Cozy Essentials" />
+          <span class="fig-coll-count">18 items</span>
+        </div>
+        <div class="fig-coll-text">
+          <h3>Cozy Essentials</h3>
+          <p>Everyday butter-soft basics and breathable loungewear designed for happy days.</p>
+        </div>
+        <div class="fig-coll-footer">Shop Now →</div>
+      </a>
+      <a class="fig-coll-card" href="seasonal-favorites-collection.html">
+        <div class="fig-coll-photo">
+          <img src="collection-seasonal.jpg" alt="Seasonal Favorites" />
+          <span class="fig-coll-count">8 items</span>
+        </div>
+        <div class="fig-coll-text">
+          <h3>Seasonal Favorites</h3>
+          <p>Bespoke hand-crafted layers and woodland knits perfect for every festive moment.</p>
+        </div>
+        <div class="fig-coll-footer">Shop Now →</div>
+      </a>
+      <a class="fig-coll-card" href="newborn-bundles-collection.html">
+        <div class="fig-coll-photo">
+          <img src="collection-newborn.jpg" alt="Newborn Bundles" />
+          <span class="fig-coll-count">15 items</span>
+        </div>
+        <div class="fig-coll-text">
+          <h3>Newborn Bundles</h3>
+          <p>Sustainably sourced premium layettes and organic wraps for the newest sweet bundle.</p>
+        </div>
+        <div class="fig-coll-footer">Shop Now →</div>
+      </a>
+      <a class="fig-coll-card" href="gift-sets-collection.html">
+        <div class="fig-coll-photo">
+          <img src="collection-giftsets.jpg" alt="Gift Sets" />
+          <span class="fig-coll-count">9 items</span>
+        </div>
+        <div class="fig-coll-text">
+          <h3>Gift Sets</h3>
+          <p>Beautifully gift-boxed collections and cuddly plush items ready to surprise warm hearts.</p>
+        </div>
+        <div class="fig-coll-footer">Shop Now →</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP BY COZY MILESTONES -->
+<section class="fig-milestones">
+  <div class="container">
+    <div class="fig-milestones-hd">
+      <span class="fig-eyebrow">milestone sizing</span>
+      <h2>Shop by Cozy Milestones</h2>
+    </div>
+    <div class="fig-milestone-pills" id="fig-milestone-pills">
+      <button type="button" class="fig-milestone-pill">0–3 months</button>
+      <button type="button" class="fig-milestone-pill active">3–6 months</button>
+      <button type="button" class="fig-milestone-pill">6–12 months</button>
+      <button type="button" class="fig-milestone-pill">1–2 years</button>
+      <button type="button" class="fig-milestone-pill">2–4 years</button>
+    </div>
+  </div>
+</section>
+
+<!-- NEW COLLECTION DROPPING SOON -->
+<section class="fig-coll-newsletter">
+  <div class="container">
+    <div class="fig-coll-newsletter-inner">
+      <div class="fig-coll-newsletter-text">
+        <h2>New Collection Dropping Soon</h2>
+        <p>Sign up to be the first to know about our next limited storybook drop, exclusive woodland designs, and seasonal pre-orders.</p>
+      </div>
+      <form class="fig-coll-newsletter-form" onsubmit="event.preventDefault(); showToast('Welcome to the family! Check your inbox 💗'); this.reset();">
+        <input type="email" placeholder="Enter your email address" required />
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<section class="fig-coll-trust-bar">
+  <div class="container">
+    <div class="fig-trust-grid">
+      <div class="fig-trust-item">
+        <div class="fig-trust-icon">🌱</div>
+        <div class="fig-trust-txt">
+          <div class="lbl">100% GOTS Organic</div>
+          <div class="sub">GOTS certified cotton</div>
+        </div>
+      </div>
+      <div class="fig-trust-item">
+        <div class="fig-trust-icon">🛡️</div>
+        <div class="fig-trust-txt">
+          <div class="lbl">Plastic-Free Packaging</div>
+          <div class="sub">Perfect for sensitive baby skin</div>
+        </div>
+      </div>
+      <div class="fig-trust-item">
+        <div class="fig-trust-icon">📦</div>
+        <div class="fig-trust-txt">
+          <div class="lbl">Carbon Neutral Shipping</div>
+          <div class="sub">On orders over $75</div>
+        </div>
+      </div>
+      <div class="fig-trust-item">
+        <div class="fig-trust-icon">♻️</div>
+        <div class="fig-trust-txt">
+          <div class="lbl">Ethically Made</div>
+          <div class="sub">Sustainably manufactured</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="fig-footer">
+  <div class="container">
+    <div class="fig-footer-cols">
+      <div class="fig-footer-brand">
+        <h3>Val &amp; Dan's Kids Boutique</h3>
+        <p>Crafting premium organic children's wear that honors soft skin and sweet moments. Beautiful styles created sustainably.</p>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All Clothing</a></li>
+          <li><a href="shop.html?category=Boys">Baby Rompers</a></li>
+          <li><a href="shop.html?category=Gift+Sets">Gift Sets</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Help</h4>
+        <ul>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">Shipping &amp; Returns</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col fig-footer-subscribe">
+        <h4>Subscribe</h4>
+        <p>Join our newsletter for sweet deals &amp; storybook updates.</p>
+        <form onsubmit="event.preventDefault(); showToast('Welcome to the family! Check your inbox 💗'); this.reset();">
+          <input type="email" placeholder="Your email address" required />
+          <button type="submit" class="fig-footer-subscribe-btn" aria-label="Subscribe">→</button>
+        </form>
+      </div>
+    </div>
+    <div class="fig-footer-rule"></div>
+    <div class="fig-footer-bottom">
+      <span>© 2025 Val &amp; Dan Kids Boutique. All rights reserved.</span>
+      <span>Privacy Policy • Terms of Service</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="site-data.js"></script>
+<script src="shop.js"></script>
+<script>
+  vdApplySiteContent();
+  document.querySelectorAll('.fig-milestone-pill').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.fig-milestone-pill').forEach((b) => b.classList.toggle('active', b === btn));
+    });
+  });
+</script>
+</body>
+</html>

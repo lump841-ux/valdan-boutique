@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Cart — Val & Dan Kids Boutique</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- PROMO BAR -->
+<div class="promo-bar">
+  <div class="container">
+    <p>✨ Free shipping on all orders over $60 • Use code: <strong>LITTLEFERNS</strong> ✨</p>
+  </div>
+</div>
+
+<!-- PAGE NAV: plain bar (not overlaid on a photo) — matches the Figma
+     "[Cart & Checkout] fern-fable-cart-page" frame's navigation section. -->
+<div class="fig-page-nav-wrap">
+  <nav class="fig-nav">
+    <div class="fig-nav-left">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="collections.html">Collections</a>
+      <a href="about.html">Our Story</a>
+    </div>
+    <a href="index.html" class="fig-nav-logo">
+      <img src="logo-transparent.png" alt="Val &amp; Dan Kids Boutique" />
+    </a>
+    <div class="fig-nav-right">
+      <a href="shop.html" aria-label="Search">🔍</a>
+      <a href="account.html" aria-label="Account">👤</a>
+      <a href="cart.html" aria-label="Cart" class="fig-nav-cart">
+        🛍️<span class="fig-cart-badge" id="cart-count">0</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</div>
+
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">✕</button>
+  <a href="index.html">Home</a>
+  <a href="shop.html">Shop</a>
+  <a href="collections.html">Collections</a>
+  <a href="about.html">Our Story</a>
+</div>
+
+<!-- CART CONTENT: breadcrumbs → title → items list / order-summary sidebar
+     split layout — matches the Figma "cart-content-container" exactly. -->
+<div class="fig-cart-content">
+  <div class="container">
+    <nav class="fig-breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a>
+      <span>/</span>
+      <a href="shop.html">Shop</a>
+      <span>/</span>
+      <span class="current">Your Shopping Bag</span>
+    </nav>
+
+    <h1 class="fig-cart-title">Your Shopping Bag ♡</h1>
+
+    <div id="cart-layout"><!-- Populated by JS --></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="fig-footer">
+  <div class="container">
+    <div class="fig-footer-cols">
+      <div class="fig-footer-brand">
+        <h3>Val &amp; Dan's Kids Boutique</h3>
+        <p>Crafting premium organic children's wear that honors soft skin and sweet moments. Beautiful styles created sustainably.</p>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All Clothing</a></li>
+          <li><a href="shop.html?category=Boys">Baby Rompers</a></li>
+          <li><a href="shop.html?category=Gift+Sets">Gift Sets</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col">
+        <h4>Help</h4>
+        <ul>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">Shipping &amp; Returns</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="fig-footer-col fig-footer-subscribe">
+        <h4>Subscribe</h4>
+        <p>Join our newsletter for sweet deals &amp; storybook updates.</p>
+        <form onsubmit="event.preventDefault(); showToast('Welcome to the family! Check your inbox 💗'); this.reset();">
+          <input type="email" placeholder="Your email address" required />
+          <button type="submit" class="fig-footer-subscribe-btn" aria-label="Subscribe">→</button>
+        </form>
+      </div>
+    </div>
+    <div class="fig-footer-rule"></div>
+    <div class="fig-footer-bottom">
+      <span>© 2025 Val &amp; Dan Kids Boutique. All rights reserved.</span>
+      <span>Privacy Policy • Terms of Service</span>
+    </div>
+  </div>
+</footer>
+
+<script src="shop.js"></script>
+<script>
+(function () {
+  function render() {
+    const cart = getCart();
+    const layout = document.getElementById('cart-layout');
+
+    if (cart.length === 0) {
+      layout.innerHTML = `
+        <div class="empty">
+          <div class="icon">🛍️</div>
+          <h3>Your cart is empty</h3>
+          <p style="margin-bottom:20px">Add some adorable styles to get started.</p>
+          <a href="shop.html" class="btn btn-primary">Shop Now</a>
+        </div>`;
+      return;
+    }
+
+    const rows = cart.map(item => {
+      const p = getProductById(item.productId);
+      if (!p) return '';
+      return `
+        <div class="fig-cart-item" data-id="${p.id}" data-size="${item.size || ''}">
+          <a href="product.html?id=${p.id}" class="fig-cart-thumb"><img src="${p.img}" alt="${p.name}" /></a>
+          <div class="fig-cart-specs">
+            <div class="fig-cart-name"><a href="product.html?id=${p.id}">${p.name}</a></div>
+            <div class="fig-cart-meta">${item.size ? `Size: ${item.size}` : p.category}</div>
+            <a class="fig-cart-remove" data-remove="${p.id}" data-size="${item.size || ''}">Remove</a>
+          </div>
+          <div class="fig-cart-qty">
+            <button type="button" data-qty="dec" aria-label="Decrease quantity">−</button>
+            <span>${item.qty}</span>
+            <button type="button" data-qty="inc" aria-label="Increase quantity">+</button>
+          </div>
+          <div class="fig-cart-price">$${(p.price * item.qty).toFixed(2)}</div>
+        </div>`;
+    }).join('');
+
+    const subtotal = cartSubtotal();
+    const shipping = cartShipping(subtotal);
+    const tax = cartTax(subtotal);
+    const total = subtotal + shipping + tax;
+    const promo = getAppliedPromo();
+
+    layout.innerHTML = `
+      <div class="fig-cart-split">
+        <div class="fig-cart-items">
+          ${rows}
+          <a href="shop.html" class="fig-cart-continue">← Continue Shopping</a>
+        </div>
+        <div class="fig-cart-summary">
+          <h3>Order Summary</h3>
+          <div class="fig-cart-divider"></div>
+          <div class="fig-cart-rows">
+            <div class="fig-cart-row"><span class="lbl">Subtotal</span><span class="val">$${subtotal.toFixed(2)}</span></div>
+            <div class="fig-cart-row"><span class="lbl">Estimated Shipping</span><span class="val">${shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2)}</span></div>
+            <div class="fig-cart-row"><span class="lbl">Tax</span><span class="val">$${tax.toFixed(2)}</span></div>
+            ${subtotal > 0 && subtotal < 60 ? `<div class="fig-cart-freeship-note">Add $${(60 - subtotal).toFixed(2)} more for free shipping</div>` : ''}
+          </div>
+          <div class="fig-cart-divider"></div>
+          <div class="fig-cart-promo">
+            <div class="fig-cart-promo-label">Apply Promo Code</div>
+            <div class="fig-cart-promo-row">
+              <input type="text" id="promo-input" placeholder="LITTLEFERNS" value="${promo ? promo.code : ''}" />
+              <button type="button" class="fig-cart-promo-btn" id="promo-apply">Apply</button>
+            </div>
+            ${promo ? `<div class="fig-cart-promo-applied">✓ ${promo.label} — code ${promo.code} applied</div>` : ''}
+          </div>
+          <div class="fig-cart-divider"></div>
+          <div class="fig-cart-total-row"><span class="lbl">Total</span><span class="val">$${total.toFixed(2)}</span></div>
+          <a href="checkout.html" class="fig-cart-checkout-btn">Proceed to Checkout ♡</a>
+        </div>
+      </div>`;
+
+    const promoBtn = document.getElementById('promo-apply');
+    if (promoBtn) {
+      promoBtn.addEventListener('click', () => {
+        const val = document.getElementById('promo-input').value;
+        const res = applyPromoCode(val);
+        if (res.ok) { showToast(res.promo.label + ' 💗'); render(); }
+        else { showToast(res.error); }
+      });
+    }
+
+    layout.querySelectorAll('[data-qty]').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const row = this.closest('.fig-cart-item');
+        const id = row.getAttribute('data-id');
+        const size = row.getAttribute('data-size') || null;
+        const current = getCart().find(i => i.productId === id && (i.size || '') === (size || ''));
+        if (!current) return;
+        const newQty = this.getAttribute('data-qty') === 'inc' ? current.qty + 1 : current.qty - 1;
+        updateCartQty(id, size, newQty);
+        render();
+      });
+    });
+
+    layout.querySelectorAll('[data-remove]').forEach(btn => {
+      btn.addEventListener('click', function () {
+        removeFromCart(this.getAttribute('data-remove'), this.getAttribute('data-size') || null);
+        render();
+        showToast('Removed from cart');
+      });
+    });
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

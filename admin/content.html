@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Website Content — Val & Dan Admin</title>
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="admin.css" />
+<style>
+  .vd-content-row { padding:14px 0; border-bottom:1px solid var(--border); }
+  .vd-content-row:last-child { border-bottom:none; }
+  .vd-content-row-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .vd-content-row-hd label { font-size:13px; font-weight:700; color:var(--ink); }
+</style>
+</head>
+<body class="vd-admin">
+<div id="vd-config-warning" class="vd-config-warning">⚠️ Supabase isn't connected yet — edit <code>admin/js/config.js</code>. See README-ADMIN.md.</div>
+
+<div class="vd-shell">
+  <aside class="vd-sidebar" id="vd-sidebar">
+    <div class="vd-sidebar-logo"><img src="../logo.jpg" alt="Val & Dan Kids Boutique" /><div><span>Val &amp; Dan</span><small>Admin</small></div></div>
+    <nav class="vd-nav">
+      <a href="dashboard.html"><span class="ic">🏠</span> Dashboard</a>
+      <a href="hero-images.html"><span class="ic">🖼️</span> Hero Images</a>
+      <a href="products.html"><span class="ic">👕</span> Products</a>
+      <a href="orders.html"><span class="ic">📦</span> Orders</a>
+      <a href="collections.html"><span class="ic">🎀</span> Collections</a>
+      <a href="new-arrivals.html"><span class="ic">✨</span> New Arrivals</a>
+      <a href="media-library.html"><span class="ic">🗂️</span> Media Library</a>
+      <a href="content.html" class="active"><span class="ic">📝</span> Website Content</a>
+      <a href="messages.html"><span class="ic">✉️</span> Messages</a>
+      <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
+      <a href="#" class="vd-nav-logout" data-vd-logout><span class="ic">🚪</span> Log Out</a>
+    </nav>
+  </aside>
+
+  <div class="vd-main">
+    <div class="vd-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="vd-mobile-nav-toggle" aria-label="Menu">☰</button>
+        <div><h1>Website Content</h1><div class="vd-topbar-sub">Edit site text — the design, fonts, and layout never change.</div></div>
+      </div>
+      <div class="vd-topbar-right"><div class="vd-admin-chip"><span class="avatar" id="vd-admin-initial">A</span><span id="vd-admin-name">…</span></div></div>
+    </div>
+
+    <div class="vd-content">
+      <div class="vd-card" style="position:sticky; top:78px; z-index:10;">
+        <div class="vd-card-hd">
+          <div><h2>Save Your Changes</h2><p id="dirty-note">No unsaved changes.</p></div>
+          <div class="vd-btn-row">
+            <button class="btn btn-outline btn-sm" id="btn-save-draft">Save as Draft</button>
+            <button class="btn btn-primary btn-sm" id="btn-publish">Publish Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="vd-card">
+        <div class="vd-card-hd"><div><h2>Announcement &amp; Buttons</h2></div></div>
+        <div id="group-announce"></div>
+      </div>
+      <div class="vd-card">
+        <div class="vd-card-hd"><div><h2>Homepage Hero</h2></div></div>
+        <div id="group-hero"></div>
+      </div>
+      <div class="vd-card">
+        <div class="vd-card-hd"><div><h2>About Us &amp; Mission</h2></div></div>
+        <div id="group-about"></div>
+      </div>
+      <div class="vd-card">
+        <div class="vd-card-hd"><div><h2>Contact &amp; Social</h2></div></div>
+        <div id="group-contact"></div>
+      </div>
+      <div class="vd-card">
+        <div class="vd-card-hd"><div><h2>Shipping &amp; Returns</h2></div></div>
+        <div id="group-policy"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/activity-log.js"></script>
+<script>
+  const GROUPS = {
+    'group-announce': ['announcement_bar', 'btn_shop_girls', 'btn_shop_boys'],
+    'group-hero': ['home_hero_eyebrow', 'home_hero_title', 'home_hero_sub'],
+    'group-about': ['about_story', 'mission_statement'],
+    'group-contact': ['contact_email', 'contact_phone', 'social_instagram', 'social_facebook', 'social_pinterest'],
+    'group-policy': ['shipping_message', 'return_policy'],
+  };
+  let rows = {};
+  let dirty = false;
+
+  function sanitize(v) {
+    // Plain-text only: strip any HTML tags the admin might paste in.
+    const div = document.createElement('div');
+    div.textContent = v;
+    return div.innerHTML;
+  }
+
+  async function loadContent() {
+    const { data, error } = await window.sb.from('site_content').select('*, updated_admin:admin_users!site_content_updated_by_fkey(full_name,email)');
+    if (error) { vdToast('Could not load content: ' + error.message, 'error'); return; }
+    rows = {};
+    (data || []).forEach((r) => { rows[r.content_key] = r; });
+    Object.entries(GROUPS).forEach(([groupId, keys]) => renderGroup(groupId, keys));
+  }
+
+  function renderGroup(groupId, keys) {
+    const el = document.getElementById(groupId);
+    el.innerHTML = keys.map((k) => {
+      const r = rows[k];
+      if (!r) return '';
+      const hasChanges = r.draft_value !== r.published_value;
+      const long = ['about_story', 'mission_statement'].includes(k);
+      return `
+        <div class="vd-content-row">
+          <div class="vd-content-row-hd">
+            <label>${r.label}</label>
+            <span class="vd-badge ${hasChanges ? 'draft' : 'published'}">${hasChanges ? 'Unpublished changes' : 'Published'}</span>
+          </div>
+          ${long
+            ? `<textarea data-key="${k}" rows="4">${r.draft_value || ''}</textarea>`
+            : `<input type="text" data-key="${k}" value="${(r.draft_value || '').replace(/"/g, '&quot;')}" />`}
+        </div>`;
+    }).join('');
+    el.querySelectorAll('[data-key]').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        rows[e.target.getAttribute('data-key')].draft_value = e.target.value;
+        setDirty(true);
+      });
+    });
+  }
+
+  function setDirty(v) {
+    dirty = v;
+    document.getElementById('dirty-note').textContent = v ? 'You have unsaved changes.' : 'No unsaved changes.';
+  }
+
+  async function saveDraft() {
+    const updates = Object.values(rows).map((r) => ({
+      content_key: r.content_key,
+      draft_value: sanitize(r.draft_value || ''),
+      updated_by: window.vdCurrentAdmin.id,
+      updated_at: new Date().toISOString(),
+    }));
+    const { error } = await window.sb.from('site_content').upsert(updates, { onConflict: 'content_key' });
+    return error;
+  }
+
+  document.getElementById('btn-save-draft').addEventListener('click', async (e) => {
+    const btn = e.currentTarget; btn.disabled = true; btn.textContent = 'Saving…';
+    const error = await saveDraft();
+    btn.disabled = false; btn.textContent = 'Save as Draft';
+    if (error) { vdToast('Could not save: ' + error.message, 'error'); return; }
+    setDirty(false);
+    vdToast('Changes saved as a draft.', 'success');
+    loadContent();
+  });
+
+  document.getElementById('btn-publish').addEventListener('click', async (e) => {
+    const btn = e.currentTarget; btn.disabled = true; btn.textContent = 'Publishing…';
+    let error = await saveDraft();
+    if (!error) {
+      const now = new Date().toISOString();
+      const updates = Object.values(rows).map((r) => ({
+        content_key: r.content_key,
+        draft_value: sanitize(r.draft_value || ''),
+        published_value: sanitize(r.draft_value || ''),
+        updated_by: window.vdCurrentAdmin.id,
+        published_by: window.vdCurrentAdmin.id,
+        updated_at: now,
+        published_at: now,
+      }));
+      const res = await window.sb.from('site_content').upsert(updates, { onConflict: 'content_key' });
+      error = res.error;
+    }
+    btn.disabled = false; btn.textContent = 'Publish Changes';
+    if (error) { vdToast('Could not publish: ' + error.message, 'error'); return; }
+    await vdLogActivity('content.publish', 'site_content', null, {});
+    setDirty(false);
+    vdToast('Changes published successfully. The live site now shows the new text.', 'success');
+    loadContent();
+  });
+
+  (async function init() {
+    const admin = await vdRequireAdmin();
+    if (!admin) return;
+    document.getElementById('vd-admin-initial').textContent = (admin.full_name || admin.email).charAt(0).toUpperCase();
+    await loadContent();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Messages — Val & Dan Admin</title>
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="admin.css" />
+<style>
+  .vd-msg-row { padding:16px; border:1.5px solid var(--border); border-radius:var(--radius-sm); margin-bottom:10px; cursor:pointer; }
+  .vd-msg-row.unread { background:var(--pink-lt); border-color:var(--pink); }
+  .vd-msg-row-hd { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:10px; }
+  .vd-msg-row-hd strong { font-size:14px; color:var(--ink); }
+  .vd-msg-row-hd span.date { font-size:11.5px; color:var(--ink-3); white-space:nowrap; }
+  .vd-msg-row p { font-size:13px; color:var(--ink-2); }
+  .vd-detail-overlay { position:fixed; inset:0; background:rgba(43,34,48,.45); z-index:850; display:none; align-items:center; justify-content:center; padding:20px; }
+  .vd-detail-overlay.open { display:flex; }
+  .vd-detail-modal { background:#fff; border-radius:var(--radius); padding:26px; max-width:520px; width:100%; box-shadow:var(--shadow-lux); max-height:88vh; overflow:auto; }
+</style>
+</head>
+<body class="vd-admin">
+<div id="vd-config-warning" class="vd-config-warning">⚠️ Supabase isn't connected yet — edit <code>admin/js/config.js</code>. See README-ADMIN.md.</div>
+
+<div class="vd-shell">
+  <aside class="vd-sidebar" id="vd-sidebar">
+    <div class="vd-sidebar-logo"><img src="../logo.jpg" alt="Val & Dan Kids Boutique" /><div><span>Val &amp; Dan</span><small>Admin</small></div></div>
+    <nav class="vd-nav">
+      <a href="dashboard.html"><span class="ic">🏠</span> Dashboard</a>
+      <a href="hero-images.html"><span class="ic">🖼️</span> Hero Images</a>
+      <a href="products.html"><span class="ic">👕</span> Products</a>
+      <a href="orders.html"><span class="ic">📦</span> Orders</a>
+      <a href="collections.html"><span class="ic">🎀</span> Collections</a>
+      <a href="new-arrivals.html"><span class="ic">✨</span> New Arrivals</a>
+      <a href="media-library.html"><span class="ic">🗂️</span> Media Library</a>
+      <a href="content.html"><span class="ic">📝</span> Website Content</a>
+      <a href="messages.html" class="active"><span class="ic">✉️</span> Messages</a>
+      <a href="settings.html"><span class="ic">⚙️</span> Settings</a>
+      <a href="#" class="vd-nav-logout" data-vd-logout><span class="ic">🚪</span> Log Out</a>
+    </nav>
+  </aside>
+
+  <div class="vd-main">
+    <div class="vd-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="vd-mobile-nav-toggle" aria-label="Menu">☰</button>
+        <div><h1>Messages</h1><div class="vd-topbar-sub">Everything submitted through the Contact page.</div></div>
+      </div>
+      <div class="vd-topbar-right"><div class="vd-admin-chip"><span class="avatar" id="vd-admin-initial">A</span><span id="vd-admin-name">…</span></div></div>
+    </div>
+
+    <div class="vd-content">
+      <div class="vd-card">
+        <div class="vd-toolbar">
+          <input type="text" class="vd-search" id="search-input" placeholder="Search name, email, or message…" />
+          <select id="filter-status">
+            <option value="">All Messages</option>
+            <option value="unread">Unread</option>
+            <option value="read">Read</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+        <p id="result-count" style="font-size:12.5px;color:var(--ink-2);margin-bottom:14px;">Loading…</p>
+        <div id="msg-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="vd-detail-overlay" id="detail-overlay">
+  <div class="vd-detail-modal">
+    <div class="vd-card-hd" style="margin-bottom:14px;">
+      <div><h2 id="d-name" style="font-family:'Fraunces',serif;font-size:18px;"></h2><p id="d-date" style="font-size:12px;color:var(--ink-3);"></p></div>
+      <span class="vd-badge" id="d-badge"></span>
+    </div>
+    <p style="font-size:13px;color:var(--ink-2);margin-bottom:6px;"><strong>Email:</strong> <a href="#" id="d-email"></a></p>
+    <p style="font-size:13px;color:var(--ink-2);margin-bottom:6px;" id="d-phone-row"><strong>Phone:</strong> <span id="d-phone"></span></p>
+    <p style="font-size:13px;color:var(--ink-2);margin-bottom:6px;" id="d-subject-row"><strong>Subject:</strong> <span id="d-subject"></span></p>
+    <p style="font-size:13.5px;color:var(--ink);line-height:1.6;background:var(--beige);border-radius:10px;padding:14px;margin:14px 0;" id="d-message"></p>
+    <div class="vd-btn-row">
+      <button class="btn btn-outline btn-sm" id="btn-close">Close</button>
+      <button class="btn btn-outline btn-sm" id="btn-toggle-read">Mark Unread</button>
+      <button class="btn btn-outline btn-sm" id="btn-archive">Archive</button>
+      <button class="btn btn-danger btn-sm" id="btn-delete">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/auth-guard.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/activity-log.js"></script>
+<script>
+  let allMessages = [];
+  let activeMsg = null;
+
+  async function loadMessages() {
+    const search = document.getElementById('search-input').value.trim().toLowerCase();
+    const status = document.getElementById('filter-status').value;
+    let q = window.sb.from('contact_messages').select('*').order('created_at', { ascending: false });
+    if (status) q = q.eq('status', status);
+    const { data, error } = await q;
+    allMessages = data || [];
+    if (search) {
+      allMessages = allMessages.filter((m) =>
+        (m.name || '').toLowerCase().includes(search) ||
+        (m.email || '').toLowerCase().includes(search) ||
+        (m.message || '').toLowerCase().includes(search));
+    }
+    render();
+    if (error) vdToast('Could not load messages: ' + error.message, 'error');
+  }
+
+  function render() {
+    document.getElementById('result-count').textContent = allMessages.length + (allMessages.length === 1 ? ' message' : ' messages');
+    const wrap = document.getElementById('msg-list');
+    if (!allMessages.length) { wrap.innerHTML = '<p class="hint">No messages yet.</p>'; return; }
+    wrap.innerHTML = allMessages.map((m) => `
+      <div class="vd-msg-row ${m.status === 'unread' ? 'unread' : ''}" data-id="${m.id}">
+        <div class="vd-msg-row-hd">
+          <strong>${m.name} ${m.status === 'unread' ? '•' : ''}</strong>
+          <span class="date">${new Date(m.created_at).toLocaleString()}</span>
+        </div>
+        <p>${(m.subject ? m.subject + ' — ' : '') + m.message.slice(0, 110)}${m.message.length > 110 ? '…' : ''}</p>
+      </div>`).join('');
+    wrap.querySelectorAll('.vd-msg-row').forEach((row) => row.addEventListener('click', () => openMessage(row.getAttribute('data-id'))));
+  }
+
+  async function openMessage(id) {
+    activeMsg = allMessages.find((m) => m.id === id);
+    if (!activeMsg) return;
+    document.getElementById('d-name').textContent = activeMsg.name;
+    document.getElementById('d-date').textContent = new Date(activeMsg.created_at).toLocaleString();
+    document.getElementById('d-email').textContent = activeMsg.email;
+    document.getElementById('d-email').href = 'mailto:' + activeMsg.email;
+    document.getElementById('d-phone-row').style.display = activeMsg.phone ? 'block' : 'none';
+    document.getElementById('d-phone').textContent = activeMsg.phone || '';
+    document.getElementById('d-subject-row').style.display = activeMsg.subject ? 'block' : 'none';
+    document.getElementById('d-subject').textContent = activeMsg.subject || '';
+    document.getElementById('d-message').textContent = activeMsg.message;
+    const badge = document.getElementById('d-badge');
+    badge.className = 'vd-badge ' + activeMsg.status;
+    badge.textContent = activeMsg.status;
+    document.getElementById('btn-toggle-read').textContent = activeMsg.status === 'unread' ? 'Mark Read' : 'Mark Unread';
+    document.getElementById('detail-overlay').classList.add('open');
+
+    if (activeMsg.status === 'unread') {
+      await window.sb.from('contact_messages').update({ status: 'read', read_at: new Date().toISOString() }).eq('id', id);
+      await vdLogActivity('message.status', 'contact_message', id, { status: 'read' });
+      loadMessages();
+    }
+  }
+  document.getElementById('btn-close').addEventListener('click', () => document.getElementById('detail-overlay').classList.remove('open'));
+
+  document.getElementById('btn-toggle-read').addEventListener('click', async () => {
+    const newStatus = activeMsg.status === 'unread' ? 'read' : 'unread';
+    await window.sb.from('contact_messages').update({ status: newStatus, read_at: newStatus === 'read' ? new Date().toISOString() : null }).eq('id', activeMsg.id);
+    await vdLogActivity('message.status', 'contact_message', activeMsg.id, { status: newStatus });
+    vdToast('Message marked as ' + newStatus + '.', 'success');
+    document.getElementById('detail-overlay').classList.remove('open');
+    loadMessages();
+  });
+
+  document.getElementById('btn-archive').addEventListener('click', async () => {
+    await window.sb.from('contact_messages').update({ status: 'archived', archived_at: new Date().toISOString() }).eq('id', activeMsg.id);
+    await vdLogActivity('message.status', 'contact_message', activeMsg.id, { status: 'archived' });
+    vdToast('Message archived.', 'success');
+    document.getElementById('detail-overlay').classList.remove('open');
+    loadMessages();
+  });
+
+  document.getElementById('btn-delete').addEventListener('click', async () => {
+    const ok = await vdConfirm({ title: 'Delete this message?', body: `The message from "${activeMsg.name}" will be permanently deleted.`, confirmLabel: 'Delete' });
+    if (!ok) return;
+    const { error } = await window.sb.from('contact_messages').delete().eq('id', activeMsg.id);
+    if (error) { vdToast('Could not delete: ' + error.message, 'error'); return; }
+    await vdLogActivity('message.status', 'contact_message', activeMsg.id, { status: 'deleted' });
+    vdToast('Message deleted.', 'success');
+    document.getElementById('detail-overlay').classList.remove('open');
+    loadMessages();
+  });
+
+  document.getElementById('search-input').addEventListener('input', debounce(loadMessages, 300));
+  document.getElementById('filter-status').addEventListener('change', loadMessages);
+  function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+  (async function init() {
+    const admin = await vdRequireAdmin();
+    if (!admin) return;
+    document.getElementById('vd-admin-initial').textContent = (admin.full_name || admin.email).charAt(0).toUpperCase();
+    await loadMessages();
+  })();
+</script>
+</body>
+</html>
